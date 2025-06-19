@@ -1,0 +1,190 @@
+import { useState, useEffect } from 'react'
+import { supabase } from './lib/supabase'
+import type { Subject } from './lib/supabase'
+import { SubjectCard } from './components/SubjectCard'
+
+function App() {
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadSubjects()
+  }, [])
+
+  const loadSubjects = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('subjects')
+        .select('*')
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      setSubjects(data || [])
+    } catch (err) {
+      console.error('Error loading subjects:', err)
+      setError('Failed to load subjects. Please check your Supabase configuration.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const Header = () => (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#1A1A1A]/95 backdrop-blur-lg border-b border-red-500/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between">
+          {/* Left side with By Meeedly logo */}
+          <div className="flex items-center">
+            <a href="https://www.linkedin.com/company/global-summer-challenge/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+              <img src="/By Meeedly.png" alt="By Meeedly" className="h-10 w-auto" />
+            </a>
+          </div>
+
+          {/* Center content */}
+          <div className="flex-1 text-center mx-4">
+            <div className="glass px-4 py-2 rounded-full text-sm text-red-100 border border-red-500/30 inline-block">
+              Gradence: Anonymous Subject Voter
+            </div>
+          </div>
+
+          {/* Right side with main logo */}
+          <div className="flex items-center">
+            <a href="https://www.linkedin.com/company/meeedly/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+              <img src="/logo.png" alt="Anonymous Subject Voter Logo" className="h-10 w-auto" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+
+  const Footer = () => (
+    <footer className="bg-[#1A1A1A]/95 border-t border-red-500/10 mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">About Gradence</h3>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              This application is developed as part of the Global Summer Challenge organized by Meeedly. A platform designed to gather honest, anonymous feedback about your learning experience.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Disclaimer</h3>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              This program is intended solely for fun and interactive engagement. It does not reflect any official academic evaluation.
+            </p>
+          </div>
+        </div>
+        <div className="mt-8 pt-8 border-t border-red-500/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <p className="text-gray-300 text-sm">
+                © {new Date().getFullYear()} Team CodeBlooded
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a 
+                href="https://www.linkedin.com/company/global-summer-challenge/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-red-500 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+              <p className="text-xs text-gray-400">Version 1.0.0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center relative overflow-hidden pt-20">
+          <div className="text-center relative z-10">
+            <div className="relative mb-8">
+              <div className="animate-spin rounded-full h-20 w-20 border-4 border-red-500 border-t-transparent mx-auto"></div>
+            </div>
+            <h2 className="text-2xl font-display font-bold text-shimmer mb-4">Loading Subjects</h2>
+            <p className="text-gray-300 text-lg font-light">Preparing your voting experience...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center relative pt-20">
+          <div className="text-center max-w-md mx-auto p-8 relative z-10">
+            <div className="glass-strong rounded-3xl p-8 mb-6 shadow-2xl border border-red-500/20">
+              <div className="text-6xl mb-4 animate-pulse">⚠️</div>
+              <h2 className="font-display font-bold text-2xl mb-3 text-gradient">Oops! Something went wrong</h2>
+              <p className="text-red-300 font-light">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1A1A1A]">
+      <Header />
+      
+      <main className="relative pt-20">
+        {/* Hero Section */}
+        <div className="text-center py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <h3 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 font-display">
+              Rate Your Learning Experience
+            </h3>
+            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              Help improve education by sharing your honest feedback. Your votes are completely anonymous! 🚀
+            </p>
+          </div>
+          
+          {/* Background Effects */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
+          </div>
+        </div>
+
+        {/* Subjects Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {subjects.length === 0 ? (
+            <div className="text-center">
+              <div className="glass-strong rounded-3xl p-12 border border-red-500/20 shadow-2xl">
+                <div className="text-8xl mb-6">📝</div>
+                <h3 className="font-display font-bold text-2xl mb-3 text-white">No subjects available yet</h3>
+                <p className="text-gray-300 font-light">Check back later for new topics to vote on!</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {subjects.map((subject) => (
+                <SubjectCard key={subject.id} subject={subject} />
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+export default App
+

@@ -1,0 +1,100 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Custom styles */
+.glass {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.glass-strong {
+  backdrop-filter: blur(16px);
+  background: rgba(45, 45, 45, 0.8);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #FF3B30, #FF6B6B);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hover-lift {
+  transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
+}
+
+.speedometer {
+  position: relative;
+  width: 12rem;
+  height: 6rem;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #2D2D2D, #1A1A1A);
+  border-top-left-radius: 150px;
+  border-top-right-radius: 150px;
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  overflow: hidden;
+}
+
+.speedometer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at bottom, rgba(255, 59, 48, 0.1) 0%, transparent 70%);
+}
+
+.speedometer-needle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 4rem;
+  background: #FF3B30;
+  transform-origin: bottom center;
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+}
