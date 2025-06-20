@@ -38,4 +38,75 @@ export interface SubjectStats {
     '1': number
     '2': number
   }
+}
+
+// Leaderboard Types
+export interface TopSubject {
+  subject_id: string
+  subject_name: string
+  average_vote: number
+  total_votes: number
+  rank_position: number
+}
+
+export interface MostVotedSubject {
+  subject_id: string
+  subject_name: string
+  total_votes: number
+  average_vote: number
+  rank_position: number
+}
+
+export interface TodaysTopSubject {
+  subject_id: string
+  subject_name: string
+  todays_votes: number
+  average_vote: number
+  rank_position: number
+}
+
+export interface WeeklyTrendingSubject {
+  subject_id: string
+  subject_name: string
+  weekly_votes: number
+  average_vote: number
+  rank_position: number
+}
+
+export interface VoteTrend {
+  date_label: string
+  total_votes: number
+  skull_votes: number
+  sleepy_votes: number
+  heart_votes: number
+  fire_votes: number
+}
+
+export interface HourlyActivity {
+  hour_label: string
+  vote_count: number
+}
+
+export interface MostImprovedSubject {
+  subject_id: string
+  subject_name: string
+  current_rating: number
+  previous_rating: number
+  improvement_score: number
+  rank_position: number
+}
+
+export interface OverallStats {
+  total_subjects: number
+  total_votes: number
+  total_users: number
+  average_vote: number
+  positive_vote_percentage: number
+  negative_vote_percentage: number
+}
+
+export interface EmojiVoteDistribution {
+  emoji_name: string
+  vote_count: number
+  vote_percentage: number
 } 
