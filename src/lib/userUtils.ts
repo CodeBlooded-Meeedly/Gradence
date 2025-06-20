@@ -1,34 +1,52 @@
 import { v4 as uuidv4 } from 'uuid'
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
-const USER_ID_KEY = 'anonymous_voter_user_id'
-const VOTES_KEY = 'anonymous_voter_votes'
+const VOTER_UUID_KEY = 'Voter-UUID'
+const VOTED_SUBJECTS_KEY = 'Voted-Subjects'
 
+// Generates and stores a unique user ID in localStorage.
 export const getUserID = (): string => {
-  let userId = localStorage.getItem(USER_ID_KEY)
+  let userId = localStorage.getItem(VOTER_UUID_KEY)
   if (!userId) {
     userId = uuidv4()
-    localStorage.setItem(USER_ID_KEY, userId)
+    localStorage.setItem(VOTER_UUID_KEY, userId)
   }
   return userId
 }
 
-export const getStoredVotes = (): Record<string, number> => {
-  const votes = localStorage.getItem(VOTES_KEY)
-  return votes ? JSON.parse(votes) : {}
+// Generates a browser fingerprint for additional duplicate vote checking.
+export const getFingerprint = async (): Promise<string> => {
+  const fp = await FingerprintJS.load()
+  const result = await fp.get()
+  return result.visitorId
 }
 
-export const storeVote = (subjectId: string, voteValue: number): void => {
-  const votes = getStoredVotes()
-  votes[subjectId] = voteValue
-  localStorage.setItem(VOTES_KEY, JSON.stringify(votes))
+// Stores a record of a user voting for a subject in localStorage.
+export const storeVote = (subjectId: string, voteValue: number) => {
+  const votedSubjects = getVotedSubjects()
+  votedSubjects[subjectId] = voteValue
+  localStorage.setItem(VOTED_SUBJECTS_KEY, JSON.stringify(votedSubjects))
 }
 
+// Checks if a user has already voted for a specific subject.
 export const hasVoted = (subjectId: string): boolean => {
-  const votes = getStoredVotes()
-  return subjectId in votes
+  const votedSubjects = getVotedSubjects()
+  return votedSubjects.hasOwnProperty(subjectId)
 }
 
+// Retrieves the vote value for a subject the user has voted on.
 export const getVoteValue = (subjectId: string): number | null => {
-  const votes = getStoredVotes()
-  return votes[subjectId] || null
+  const votedSubjects = getVotedSubjects()
+  return votedSubjects[subjectId] || null
+}
+
+// Helper function to get the voted subjects object from localStorage.
+const getVotedSubjects = (): { [key: string]: number } => {
+  try {
+    const votedSubjects = localStorage.getItem(VOTED_SUBJECTS_KEY)
+    return votedSubjects ? JSON.parse(votedSubjects) : {}
+  } catch (error) {
+    console.error('Error parsing Voted-Subjects from localStorage', error)
+    return {}
+  }
 } 

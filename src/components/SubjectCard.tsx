@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Subject, SubjectStats } from '../lib/supabase'
-import { getUserID, hasVoted, storeVote, getVoteValue } from '../lib/userUtils'
+import { getUserID, hasVoted, storeVote, getVoteValue, getFingerprint } from '../lib/userUtils'
 import confetti from 'canvas-confetti'
 
 interface SubjectCardProps {
   subject: Subject
+  onVoteSubmitted?: () => void
 }
 
 const emojis = ['💀', '😴', '❤️', '🔥']
 const labels = ['Way too hard', 'Too boring', 'Loved the subject', 'Super Fun']
 const values = [-2, -1, 1, 2]
 
-export const SubjectCard = ({ subject }: SubjectCardProps) => {
+export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
   const [stats, setStats] = useState<SubjectStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [userVote, setUserVote] = useState<number | null>(null)
@@ -50,6 +51,7 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
     setLoading(true)
     try {
       const userId = getUserID()
+      const fingerprintId = await getFingerprint()
       
       const { data, error } = await supabase
         .from('votes')
@@ -57,7 +59,8 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
           user_id: userId,
           subject_id: subject.id,
           vote_value: voteValue,
-          feedback: feedback.trim() || null
+          feedback: feedback.trim() || null,
+          fingerprint_id: fingerprintId
         })
         .select()
 
@@ -68,7 +71,12 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
           subjectId: subject.id,
           voteValue
         })
-        throw error
+        // Handle unique constraint violation gracefully
+        if (error.code === '23505') { // unique_violation
+          alert('You have already voted for this subject from this device or browser.')
+        } else {
+          throw error
+        }
       }
 
       console.log('Vote submitted successfully:', data)
@@ -76,6 +84,11 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
       setUserVote(voteValue)
       setHasUserVoted(true)
       await loadStats()
+      
+      // Notify parent component that a vote was submitted
+      if (onVoteSubmitted) {
+        onVoteSubmitted()
+      }
       
       if (voteValue > 0) {
         setShowCelebration(true)
@@ -89,7 +102,7 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
       }
     } catch (error) {
       console.error('Error voting:', error)
-      alert('Failed to submit vote. Please try again. Error: ' + (error as Error).message)
+      alert('Failed to submit vote. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -142,11 +155,11 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
                   onMouseEnter={() => setShowTooltip(index)}
                   onMouseLeave={() => setShowTooltip(null)}
                   disabled={loading}
-                  className="relative group flex flex-col items-center p-4 rounded-2xl glass border-2 border-red-500/20 hover:border-red-500/50 hover:bg-gradient-to-br hover:from-red-500/20 hover:to-red-400/20 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110"
+                  className="relative group flex flex-col items-center p-4 rounded-2xl bg-black/60 border-2 border-red-500/30 hover:border-red-500/60 hover:bg-gradient-to-br hover:from-red-500/20 hover:to-red-400/20 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110"
                 >
                   <span className="text-3xl sm:text-4xl">{emoji}</span>
                   {showTooltip === index && (
-                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-[#1A1A1A]/90 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap border border-red-500/20">
+                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-black/95 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap border border-red-500/30 shadow-2xl">
                       {labels[index]}
                     </div>
                   )}
@@ -161,7 +174,7 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value.slice(0, 200))}
                 maxLength={200}
-                className="w-full px-4 py-3 rounded-xl bg-[#2D2D2D] border border-red-500/20 text-gray-100 placeholder-gray-400 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 transition-all duration-300 resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-black/60 border border-red-500/30 text-gray-100 placeholder-gray-400 focus:border-red-500/60 focus:ring-2 focus:ring-red-500/30 transition-all duration-300 resize-none"
                 rows={3}
               />
               <div className="text-right text-sm text-gray-400">
@@ -170,7 +183,7 @@ export const SubjectCard = ({ subject }: SubjectCardProps) => {
             </div>
           </div>
         ) : (
-          <div className="text-center text-gray-100 p-4 rounded-xl bg-gradient-to-r from-red-500/10 to-red-400/10 border border-red-500/20">
+          <div className="text-center text-gray-100 p-4 rounded-xl bg-gradient-to-r from-red-500/20 to-red-400/20 border border-red-500/30">
             Thanks for voting! 🎉
           </div>
         )}
