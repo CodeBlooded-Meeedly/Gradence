@@ -44,12 +44,12 @@
 /* Custom styles */
 .glass {
   backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .glass-strong {
   backdrop-filter: blur(16px);
-  background: rgba(45, 45, 45, 0.8);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .text-gradient {
@@ -73,10 +73,10 @@
   width: 12rem;
   height: 6rem;
   margin: 0 auto;
-  background: linear-gradient(to bottom, #2D2D2D, #1A1A1A);
+  background: linear-gradient(to bottom, #1A1A1A, #000000);
   border-top-left-radius: 150px;
   border-top-right-radius: 150px;
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  border: 1px solid rgba(255, 59, 48, 0.3);
   overflow: hidden;
 }
 
@@ -97,4 +97,63 @@
   transform-origin: bottom center;
   transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+}
+
+.subject-card {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(26, 26, 26, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.subject-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 59, 48, 0.5), transparent);
+}
+
+.subject-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 59, 48, 0.5);
+  box-shadow: 0 20px 40px rgba(255, 59, 48, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 59, 48, 0.3);
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #FF3B30, #FF6B6B, #FF3B30);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
