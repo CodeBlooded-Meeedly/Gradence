@@ -38,6 +38,14 @@ export interface SubjectStats {
     '1': number
     '2': number
   }
+  tags: {
+    'good prof': number
+    'bad prof': number
+    'heavy workload': number
+    'light workload': number
+    'easy': number
+    'hard': number
+  }
 }
 
 // Leaderboard Types

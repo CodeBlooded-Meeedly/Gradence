@@ -115,6 +115,24 @@
   }
 }
 
+/* fix to remove red box from cursor */
+.react-select__input input {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.react-select__control--is-focused {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.react-select__control {
+  outline: none !important;
+}
+.react-select__input input {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
