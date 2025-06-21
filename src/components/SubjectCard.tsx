@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase'
 import type { Subject, SubjectStats } from '../lib/supabase'
 import { getUserID, hasVoted, storeVote, getVoteValue, getFingerprint } from '../lib/userUtils'
 import confetti from 'canvas-confetti'
+import Select from 'react-select'
+import { customSelectStyles } from '../lib/styleUtils'
 
 interface SubjectCardProps {
   subject: Subject
@@ -12,6 +14,8 @@ interface SubjectCardProps {
 const emojis = ['💀', '😴', '❤️', '🔥']
 const labels = ['Way too hard', 'Too boring', 'Loved the subject', 'Super Fun']
 const values = [-2, -1, 1, 2]
+const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
+const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 
 export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
   const [stats, setStats] = useState<SubjectStats | null>(null)
@@ -21,6 +25,7 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
   const [showCelebration, setShowCelebration] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [showTooltip, setShowTooltip] = useState<number | null>(null)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
 
   useEffect(() => {
     loadStats()
@@ -53,6 +58,8 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
       const userId = getUserID()
       const fingerprintId = await getFingerprint()
       
+      /* TODO: increase tag count for each selected tag */
+
       const { data, error } = await supabase
         .from('votes')
         .insert({
@@ -165,6 +172,20 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
                   )}
                 </button>
               ))}
+            </div>
+
+            {/* Tag Selection */}
+            {/* TODO: fix styling issues */}
+            <div>
+              <Select
+                isMulti
+                options={tagOptions}
+                value={selectedTags.map(tag => ({ value: tag, label: tag }))}
+                onChange={(selected) => setSelectedTags(selected.map(s => s.value))}
+                placeholder="Select tags (optional)"
+                styles={customSelectStyles}
+                classNamePrefix="react-select"
+              />
             </div>
 
             {/* Feedback Input */}
