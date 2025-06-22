@@ -4,7 +4,6 @@ import type { Subject, SubjectStats } from '../lib/supabase'
 import { getUserID, hasVoted, storeVote, getVoteValue, getFingerprint } from '../lib/userUtils'
 import confetti from 'canvas-confetti'
 import Select from 'react-select'
-import { customSelectStyles } from '../lib/styleUtils'
 
 const POWERUP_KEY = 'double-vote-powerup'
 
@@ -187,7 +186,6 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
             </div>
 
             {/* Tag Selection */}
-            {/* TODO: fix styling issues */}
             <div>
               <Select
                 isMulti
@@ -195,7 +193,6 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
                 value={selectedTags.map(tag => ({ value: tag, label: tag }))}
                 onChange={(selected) => setSelectedTags(selected.map(s => s.value))}
                 placeholder="Select tags (optional)"
-                styles={customSelectStyles}
                 classNamePrefix="react-select"
               />
             </div>
