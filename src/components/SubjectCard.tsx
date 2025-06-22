@@ -6,6 +6,8 @@ import confetti from 'canvas-confetti'
 import Select from 'react-select'
 import { customSelectStyles } from '../lib/styleUtils'
 
+const POWERUP_KEY = 'double-vote-powerup'
+
 interface SubjectCardProps {
   subject: Subject
   onVoteSubmitted?: () => void
@@ -57,18 +59,22 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
     try {
       const userId = getUserID()
       const fingerprintId = await getFingerprint()
+      const isDoubleVote = localStorage.getItem(POWERUP_KEY) === 'true'
+      
+      const votePayload = {
+        user_id: userId,
+        subject_id: subject.id,
+        vote_value: voteValue,
+        feedback: feedback.trim() || null,
+        fingerprint_id: fingerprintId,
+        vote_weight: isDoubleVote ? 2 : 1
+      }
       
       /* TODO: increase tag count for each selected tag */
 
       const { data, error } = await supabase
         .from('votes')
-        .insert({
-          user_id: userId,
-          subject_id: subject.id,
-          vote_value: voteValue,
-          feedback: feedback.trim() || null,
-          fingerprint_id: fingerprintId
-        })
+        .insert(votePayload)
         .select()
 
       if (error) {
@@ -90,6 +96,12 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
       storeVote(subject.id, voteValue)
       setUserVote(voteValue)
       setHasUserVoted(true)
+
+      // Remove power-up after use
+      if (isDoubleVote) {
+        localStorage.removeItem(POWERUP_KEY)
+      }
+
       await loadStats()
       
       // Notify parent component that a vote was submitted

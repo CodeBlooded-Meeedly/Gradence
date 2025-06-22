@@ -1,5 +1,6 @@
 -- Complete Leaderboard Functions for Live Analytics
 -- All time-based calculations are performed in PST (America/Los_Angeles).
+-- All calculations now factor in 'vote_weight'.
 
 -- Drop existing functions to avoid conflicts
 DROP FUNCTION IF EXISTS get_top_subjects_all_time(INTEGER);
@@ -27,9 +28,12 @@ BEGIN
   SELECT 
     s.id,
     s.name,
-    ROUND(COALESCE(AVG(v.vote_value), 0)::numeric, 2) as average_vote,
-    COUNT(v.id) as total_votes,
-    ROW_NUMBER() OVER (ORDER BY COALESCE(AVG(v.vote_value), 0) DESC, COUNT(v.id) DESC) as rank_position
+    CASE 
+      WHEN SUM(v.vote_weight) > 0 THEN ROUND(SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight), 2)
+      ELSE 0
+    END as average_vote,
+    COALESCE(SUM(v.vote_weight), 0) as total_votes,
+    ROW_NUMBER() OVER (ORDER BY (CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END) DESC, COALESCE(SUM(v.vote_weight), 0) DESC) as rank_position
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id
   GROUP BY s.id, s.name
@@ -53,9 +57,12 @@ BEGIN
   SELECT 
     s.id,
     s.name,
-    COUNT(v.id) as total_votes,
-    ROUND(COALESCE(AVG(v.vote_value), 0)::numeric, 2) as average_vote,
-    ROW_NUMBER() OVER (ORDER BY COUNT(v.id) DESC, COALESCE(AVG(v.vote_value), 0) DESC) as rank_position
+    COALESCE(SUM(v.vote_weight), 0) as total_votes,
+    CASE 
+      WHEN SUM(v.vote_weight) > 0 THEN ROUND(SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight), 2)
+      ELSE 0
+    END as average_vote,
+    ROW_NUMBER() OVER (ORDER BY COALESCE(SUM(v.vote_weight), 0) DESC, (CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END) DESC) as rank_position
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id
   GROUP BY s.id, s.name
@@ -78,9 +85,12 @@ BEGIN
   SELECT 
     s.id,
     s.name,
-    COALESCE(COUNT(v.id), 0) as todays_votes,
-    ROUND(COALESCE(AVG(v.vote_value), 0)::numeric, 2) as average_vote,
-    ROW_NUMBER() OVER (ORDER BY COUNT(v.id) DESC, COALESCE(AVG(v.vote_value), 0) DESC) as rank_position
+    COALESCE(SUM(v.vote_weight), 0) as todays_votes,
+    CASE 
+      WHEN SUM(v.vote_weight) > 0 THEN ROUND(SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight), 2)
+      ELSE 0
+    END as average_vote,
+    ROW_NUMBER() OVER (ORDER BY COALESCE(SUM(v.vote_weight), 0) DESC, (CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END) DESC) as rank_position
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id AND (v.created_at AT TIME ZONE 'America/Los_Angeles')::date = (now() AT TIME ZONE 'America/Los_Angeles')::date
   GROUP BY s.id, s.name
@@ -103,9 +113,12 @@ BEGIN
   SELECT 
     s.id,
     s.name,
-    COUNT(v.id) as weekly_votes,
-    ROUND(COALESCE(AVG(v.vote_value), 0)::numeric, 2) as average_vote,
-    ROW_NUMBER() OVER (ORDER BY COUNT(v.id) DESC, COALESCE(AVG(v.vote_value), 0) DESC) as rank_position
+    COALESCE(SUM(v.vote_weight), 0) as weekly_votes,
+    CASE 
+      WHEN SUM(v.vote_weight) > 0 THEN ROUND(SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight), 2)
+      ELSE 0
+    END as average_vote,
+    ROW_NUMBER() OVER (ORDER BY COALESCE(SUM(v.vote_weight), 0) DESC, (CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END) DESC) as rank_position
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id AND (v.created_at AT TIME ZONE 'America/Los_Angeles')::date >= ((now() AT TIME ZONE 'America/Los_Angeles')::date - INTERVAL '6 days')
   GROUP BY s.id, s.name
@@ -128,11 +141,11 @@ BEGIN
   RETURN QUERY
   SELECT 
     TO_CHAR((v.created_at AT TIME ZONE 'America/Los_Angeles')::date, 'Mon DD') as date_label,
-    COUNT(v.id) as total_votes,
-    COUNT(CASE WHEN v.vote_value = -2 THEN 1 END) as skull_votes,
-    COUNT(CASE WHEN v.vote_value = -1 THEN 1 END) as sleepy_votes,
-    COUNT(CASE WHEN v.vote_value = 1 THEN 1 END) as heart_votes,
-    COUNT(CASE WHEN v.vote_value = 2 THEN 1 END) as fire_votes
+    SUM(v.vote_weight) as total_votes,
+    SUM(CASE WHEN v.vote_value = -2 THEN v.vote_weight ELSE 0 END) as skull_votes,
+    SUM(CASE WHEN v.vote_value = -1 THEN v.vote_weight ELSE 0 END) as sleepy_votes,
+    SUM(CASE WHEN v.vote_value = 1 THEN v.vote_weight ELSE 0 END) as heart_votes,
+    SUM(CASE WHEN v.vote_value = 2 THEN v.vote_weight ELSE 0 END) as fire_votes
   FROM votes v
   WHERE (v.created_at AT TIME ZONE 'America/Los_Angeles')::date >= ((now() AT TIME ZONE 'America/Los_Angeles')::date - INTERVAL '6 days')
   GROUP BY (v.created_at AT TIME ZONE 'America/Los_Angeles')::date
@@ -154,7 +167,7 @@ BEGIN
   vote_counts AS (
     SELECT 
       EXTRACT(hour FROM v.created_at AT TIME ZONE 'America/Los_Angeles') as hour,
-      COUNT(v.id) as vote_count
+      SUM(v.vote_weight) as vote_count
     FROM votes v
     WHERE (v.created_at AT TIME ZONE 'America/Los_Angeles')::date = (now() AT TIME ZONE 'America/Los_Angeles')::date
     GROUP BY EXTRACT(hour FROM v.created_at AT TIME ZONE 'America/Los_Angeles')
@@ -183,7 +196,7 @@ BEGIN
   WITH current_period AS (
     SELECT 
       v.subject_id as id,
-      AVG(v.vote_value) as current_avg
+      CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END as current_avg
     FROM votes v
     WHERE (v.created_at AT TIME ZONE 'America/Los_Angeles')::date >= ((now() AT TIME ZONE 'America/Los_Angeles')::date - INTERVAL '6 days')
     GROUP BY v.subject_id
@@ -191,7 +204,7 @@ BEGIN
   previous_period AS (
     SELECT 
       v.subject_id as id,
-      AVG(v.vote_value) as previous_avg
+      CASE WHEN SUM(v.vote_weight) > 0 THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight) ELSE 0 END as previous_avg
     FROM votes v
     WHERE (v.created_at AT TIME ZONE 'America/Los_Angeles')::date BETWEEN ((now() AT TIME ZONE 'America/Los_Angeles')::date - INTERVAL '13 days') AND ((now() AT TIME ZONE 'America/Los_Angeles')::date - INTERVAL '7 days')
     GROUP BY v.subject_id
@@ -221,22 +234,28 @@ RETURNS TABLE (
   positive_vote_percentage NUMERIC,
   negative_vote_percentage NUMERIC
 ) AS $$
+DECLARE
+  total_vote_weight BIGINT;
 BEGIN
+  total_vote_weight := (SELECT SUM(vote_weight) FROM votes);
+
   RETURN QUERY
   SELECT 
     (SELECT COUNT(*) FROM subjects) as total_subjects,
-    (SELECT COUNT(*) FROM votes) as total_votes,
+    total_vote_weight as total_votes,
     (SELECT COUNT(DISTINCT user_id) FROM votes) as total_users,
-    ROUND(COALESCE(AVG(v.vote_value), 0)::numeric, 2) as average_vote,
     CASE 
-      WHEN (SELECT COUNT(*) FROM votes) > 0 THEN ROUND((COUNT(CASE WHEN v.vote_value > 0 THEN 1 END) * 100.0 / COUNT(*))::numeric, 1)
+      WHEN total_vote_weight > 0 THEN ROUND((SELECT SUM(v.vote_value * v.vote_weight) FROM votes v)::numeric / total_vote_weight, 2)
+      ELSE 0 
+    END as average_vote,
+    CASE 
+      WHEN total_vote_weight > 0 THEN ROUND((SELECT SUM(v.vote_weight) FROM votes v WHERE v.vote_value > 0) * 100.0 / total_vote_weight, 1)
       ELSE 0 
     END as positive_vote_percentage,
     CASE 
-      WHEN (SELECT COUNT(*) FROM votes) > 0 THEN ROUND((COUNT(CASE WHEN v.vote_value < 0 THEN 1 END) * 100.0 / COUNT(*))::numeric, 1)
+      WHEN total_vote_weight > 0 THEN ROUND((SELECT SUM(v.vote_weight) FROM votes v WHERE v.vote_value < 0) * 100.0 / total_vote_weight, 1)
       ELSE 0
-    END as negative_vote_percentage
-  FROM votes v;
+    END as negative_vote_percentage;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -247,7 +266,11 @@ RETURNS TABLE (
   vote_count BIGINT,
   vote_percentage NUMERIC
 ) AS $$
+DECLARE
+  total_vote_weight BIGINT;
 BEGIN
+  total_vote_weight := (SELECT SUM(vote_weight) FROM votes);
+
   RETURN QUERY
   SELECT 
     CASE 
@@ -256,9 +279,9 @@ BEGIN
       WHEN v.vote_value = 1 THEN '❤️ Loved the subject'
       WHEN v.vote_value = 2 THEN '🔥 Super fun'
     END as emoji_name,
-    COUNT(v.id) as vote_count,
+    SUM(v.vote_weight) as vote_count,
     CASE 
-      WHEN (SELECT COUNT(*) FROM votes) > 0 THEN ROUND((COUNT(v.id) * 100.0 / (SELECT COUNT(*) FROM votes))::numeric, 1)
+      WHEN total_vote_weight > 0 THEN ROUND((SUM(v.vote_weight) * 100.0 / total_vote_weight)::numeric, 1)
       ELSE 0
     END as vote_percentage
   FROM votes v

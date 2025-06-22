@@ -4,15 +4,26 @@ import type { Subject } from './lib/supabase'
 import { SubjectCard } from './components/SubjectCard'
 import { Leaderboard } from './components/Leaderboard'
 import { ShareButton } from './components/ShareButton'
+import { SpinWheel } from './components/SpinWheel'
+
+const VISITED_KEY = 'gradence-has-visited'
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [leaderboardKey, setLeaderboardKey] = useState(0) // Force leaderboard refresh
+  const [leaderboardKey, setLeaderboardKey] = useState(0)
+  const [isSpinWheelModalOpen, setIsSpinWheelModalOpen] = useState(false)
 
   useEffect(() => {
     loadSubjects()
+    
+    // Auto-open wheel on first visit
+    const hasVisited = localStorage.getItem(VISITED_KEY)
+    if (!hasVisited) {
+      setIsSpinWheelModalOpen(true)
+      localStorage.setItem(VISITED_KEY, 'true')
+    }
   }, [])
 
   const loadSubjects = async () => {
@@ -34,7 +45,6 @@ function App() {
   }
 
   const handleVoteSubmitted = () => {
-    // Force leaderboard to refresh by changing its key
     setLeaderboardKey(prev => prev + 1)
   }
 
@@ -42,16 +52,22 @@ function App() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-b border-red-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          {/* Left side with By Meeedly logo */}
           <div className="flex items-center">
             <a href="https://www.linkedin.com/company/global-summer-challenge/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <img src="/By Meeedly.png" alt="By Meeedly" className="h-10 w-auto" />
             </a>
           </div>
 
-          {/* Right side with share button and main logo */}
           <div className="flex items-center gap-4">
             <ShareButton />
+            <button
+              onClick={() => setIsSpinWheelModalOpen(true)}
+              className="group relative flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-4 py-2.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
+              title="Spin the Daily Wheel!"
+            >
+              <span className="text-lg animate-spin" style={{ animationDuration: '3s' }}>🎡</span>
+              <span className="font-semibold text-sm">Spin</span>
+            </button>
             <a href="https://www.linkedin.com/company/meeedly/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <img src="/logo.png" alt="Anonymous Subject Voter Logo" className="h-10 w-auto" />
             </a>
@@ -96,7 +112,7 @@ function App() {
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
               </a>
-              <p className="text-xs text-gray-400">Version 1.1.0</p>
+              <p className="text-xs text-gray-400">Version 2.0.1</p>
             </div>
           </div>
         </div>
@@ -144,8 +160,9 @@ function App() {
     <div className="min-h-screen bg-black">
       <Header />
       
+      <SpinWheel isOpen={isSpinWheelModalOpen} onClose={() => setIsSpinWheelModalOpen(false)} />
+
       <main className="relative pt-20">
-        {/* Hero Section */}
         <div className="text-center py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
           <div className="relative z-10 max-w-4xl mx-auto">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-4 font-display">
@@ -159,19 +176,16 @@ function App() {
             </p>
           </div>
           
-          {/* Background Effects */}
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
           </div>
         </div>
 
-        {/* Leaderboard Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Leaderboard key={leaderboardKey} />
         </div>
 
-        {/* Subjects Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {subjects.length === 0 ? (
             <div className="text-center">
