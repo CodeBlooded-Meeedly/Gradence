@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import type { 
-  TopSubject, 
-  MostVotedSubject, 
-  TodaysTopSubject, 
+  TopSubject,
+  MostVotedSubject,
   WeeklyTrendingSubject,
   VoteTrend,
   HourlyActivity,
   MostImprovedSubject,
-  OverallStats,
   EmojiVoteDistribution
 } from '../../lib/supabase'
 import {
@@ -23,23 +21,19 @@ import {
 interface ChartGalleryProps {
   topSubjects: TopSubject[]
   mostVoted: MostVotedSubject[]
-  todaysTop: TodaysTopSubject[]
   weeklyTrending: WeeklyTrendingSubject[]
   voteTrends: VoteTrend[]
   hourlyActivity: HourlyActivity[]
   mostImproved: MostImprovedSubject[]
-  overallStats: OverallStats | null
 }
 
 export const ChartGallery = ({
   topSubjects,
   mostVoted,
-  todaysTop,
   weeklyTrending,
   voteTrends,
   hourlyActivity,
-  mostImproved,
-  overallStats
+  mostImproved
 }: ChartGalleryProps) => {
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
   const [emojiVoteDistribution, setEmojiVoteDistribution] = useState<EmojiVoteDistribution[]>([])
