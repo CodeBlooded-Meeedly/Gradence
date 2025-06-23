@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Subject, SubjectStats } from '../lib/supabase'
-import { getUserID, hasVoted, storeVote, getVoteValue, getFingerprint } from '../lib/userUtils'
+import { getUserID, hasVoted, storeVote, getFingerprint } from '../lib/userUtils'
 import confetti from 'canvas-confetti'
 import Select from 'react-select'
 
@@ -21,7 +21,6 @@ const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
   const [stats, setStats] = useState<SubjectStats | null>(null)
   const [loading, setLoading] = useState(false)
-  const [userVote, setUserVote] = useState<number | null>(null)
   const [hasUserVoted, setHasUserVoted] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
   const [feedback, setFeedback] = useState('')
@@ -32,9 +31,6 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
     loadStats()
     const voted = hasVoted(subject.id)
     setHasUserVoted(voted)
-    if (voted) {
-      setUserVote(getVoteValue(subject.id))
-    }
   }, [subject.id])
 
   const loadStats = async () => {
@@ -93,7 +89,6 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
 
       console.log('Vote submitted successfully:', data)
       storeVote(subject.id, voteValue)
-      setUserVote(voteValue)
       setHasUserVoted(true)
 
       // Remove power-up after use
