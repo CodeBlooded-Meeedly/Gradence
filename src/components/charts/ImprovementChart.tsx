@@ -1,8 +1,8 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import type { MostImproved } from '../../lib/supabase'
+import type { MostImprovedSubject } from '../../lib/supabase'
 
 interface ImprovementChartProps {
-  data: MostImproved[]
+  data: MostImprovedSubject[]
 }
 
 export const ImprovementChart = ({ data }: ImprovementChartProps) => {
