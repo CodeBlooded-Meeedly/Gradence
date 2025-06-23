@@ -62,9 +62,9 @@ export const SpinWheel = ({ isOpen, onClose }: SpinWheelProps) => {
       setSpinResult(prize.text.replace('\n', ' '))
 
       if (prize.text.includes('Vote')) {
-        localStorage.removeItem('Voted-Subjects')
+        localStorage.setItem('vote-again-powerup', 'true')
       } else if (prize.text.includes('Double')) {
-        localStorage.setItem(POWERUP_KEY, 'true')
+        localStorage.setItem('double-vote-powerup', 'true')
       } else if (prize.text.includes('Bonus')) {
         // Allow another spin immediately
         setCanSpin(true)
