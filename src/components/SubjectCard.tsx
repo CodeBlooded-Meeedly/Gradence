@@ -6,8 +6,6 @@ import confetti from 'canvas-confetti'
 import Select from 'react-select'
 import React, { useRef } from 'react'
 
-const POWERUP_KEY = 'double-vote-powerup'
-
 interface SubjectCardProps {
   subject: Subject
   onVoteSubmitted?: () => void
