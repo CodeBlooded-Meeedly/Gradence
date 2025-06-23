@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Subject, SubjectStats } from '../lib/supabase'
 import { getUserID, hasVoted, storeVote, getFingerprint } from '../lib/userUtils'
-import confetti from 'canvas-confetti'
 import Select from 'react-select'
 import React, { useRef } from 'react'
 

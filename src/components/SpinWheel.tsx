@@ -12,7 +12,6 @@ const prizes = [
 ]
 
 const LAST_SPIN_KEY = 'lastSpinTime'
-const POWERUP_KEY = 'double-vote-powerup'
 
 interface SpinWheelProps {
   isOpen: boolean
