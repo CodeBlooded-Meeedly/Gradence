@@ -161,7 +161,7 @@ function App() {
       <Header />
       
       <SpinWheel isOpen={isSpinWheelModalOpen} onClose={() => setIsSpinWheelModalOpen(false)} />
-
+      
       <main className="relative pt-20">
         <div className="text-center py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
           <div className="relative z-10 max-w-4xl mx-auto">
