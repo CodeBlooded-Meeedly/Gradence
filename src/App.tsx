@@ -5,15 +5,22 @@ import { SubjectCard } from './components/SubjectCard'
 import { Leaderboard } from './components/Leaderboard'
 import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
+import Select from "react-select"
+import { customSelectStyles, customSelectStyles2 } from './lib/styleUtils'
 
 const VISITED_KEY = 'gradence-has-visited'
+const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
+const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [leaderboardKey, setLeaderboardKey] = useState(0)
   const [isSpinWheelModalOpen, setIsSpinWheelModalOpen] = useState(false)
+  const [courseQuery, setCourseQuery] = useState<string>('')
+  const [tagQuery, setTagQuery] = useState<string[]>([])
 
   useEffect(() => {
     loadSubjects()
@@ -26,6 +33,10 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    setFilteredSubjects(getFilteredSubjects())
+  }, [courseQuery])
+
   const loadSubjects = async () => {
     try {
       setLoading(true)
@@ -36,12 +47,22 @@ function App() {
 
       if (error) throw error
       setSubjects(data || [])
+      setFilteredSubjects(data || [])
     } catch (err) {
       console.error('Error loading subjects:', err)
       setError('Failed to load subjects. Please check your Supabase configuration.')
     } finally {
       setLoading(false)
     }
+  }
+
+  // returns list of subjects matching search criteria
+  const getFilteredSubjects = () => {
+    const subset = subjects.filter(subject => {
+      const subject_name = subject.name.trim().toLowerCase()
+      return subject_name.includes(courseQuery.trim().toLowerCase())
+    })
+    return subset
   }
 
   const handleVoteSubmitted = () => {
@@ -186,6 +207,46 @@ function App() {
           <Leaderboard key={leaderboardKey} />
         </div>
 
+        {/* search bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-red-500/30 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
+            </div>
+
+            <div className="flex">
+                <div className="w-1/3">
+                  <p className="mb-2">By name:</p>
+                  <input 
+                    type="text" 
+                    placeholder="Course name"
+                    value={courseQuery}
+                    onChange={(e) => setCourseQuery(e.target.value)}
+                    className="rounded-md px-4 py-2 w-5/6"
+                  />
+                </div>
+
+                <div className="w-1/3">
+                  <p className="mb-2">By major:</p>
+                  {/* TODO: add major filter here */}
+                </div>
+                
+                <div className="w-1/3">
+                  <p className="mb-2">Contains tags:</p>
+                  <Select
+                    isMulti
+                    options={tagOptions}
+                    value={tagQuery.map(tag => ({ value: tag, label: tag }))}
+                    onChange={(selected) => setTagQuery(selected.map(s => s.value))}
+                    placeholder="Search tags"
+                    styles={customSelectStyles2}
+                    className='react-select'
+                  />
+                </div>
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {subjects.length === 0 ? (
             <div className="text-center">
@@ -197,7 +258,7 @@ function App() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {subjects.map((subject) => (
+              {filteredSubjects.map((subject) => (
                 <SubjectCard 
                   key={subject.id} 
                   subject={subject} 
