@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase'
 import type { 
   TopSubject, 
   MostVotedSubject, 
-  TodaysTopSubject, 
   WeeklyTrendingSubject,
   VoteTrend,
   HourlyActivity,
@@ -17,7 +16,6 @@ export const Leaderboard = () => {
   const [overallStats, setOverallStats] = useState<OverallStats | null>(null)
   const [topSubjects, setTopSubjects] = useState<TopSubject[]>([])
   const [mostVoted, setMostVoted] = useState<MostVotedSubject[]>([])
-  const [todaysTop, setTodaysTop] = useState<TodaysTopSubject[]>([])
   const [weeklyTrending, setWeeklyTrending] = useState<WeeklyTrendingSubject[]>([])
   const [voteTrends, setVoteTrends] = useState<VoteTrend[]>([])
   const [hourlyActivity, setHourlyActivity] = useState<HourlyActivity[]>([])
@@ -89,7 +87,6 @@ export const Leaderboard = () => {
       if (statsResult.data) setOverallStats(statsResult.data[0])
       if (topResult.data) setTopSubjects(topResult.data)
       if (mostVotedResult.data) setMostVoted(mostVotedResult.data)
-      if (todaysResult.data) setTodaysTop(todaysResult.data)
       if (weeklyResult.data) setWeeklyTrending(weeklyResult.data)
       if (trendsResult.data) setVoteTrends(trendsResult.data)
       if (hourlyResult.data) setHourlyActivity(hourlyResult.data)
@@ -150,12 +147,10 @@ export const Leaderboard = () => {
       <ChartGallery
         topSubjects={topSubjects}
         mostVoted={mostVoted}
-        todaysTop={todaysTop}
         weeklyTrending={weeklyTrending}
         voteTrends={voteTrends}
         hourlyActivity={hourlyActivity}
         mostImproved={mostImproved}
-        overallStats={overallStats}
       />
     </div>
   )
