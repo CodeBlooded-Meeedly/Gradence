@@ -59,6 +59,7 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
       
       if (error) throw error
       if (data && data.length > 0) {
+        console.log(data[0])
         setStats(data[0])
       }
     } catch (error) {
@@ -83,8 +84,6 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
         fingerprint_id: fingerprintId,
         vote_weight: voteWeight
       }
-      
-      /* TODO: increase tag count for each selected tag */
 
       const { data, error } = await supabase
         .from('votes')
@@ -103,6 +102,22 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
           alert('You have already voted for this subject from this device or browser.')
         } else {
           throw error
+        }
+      }
+
+      // add tag votes to backend
+      if (selectedTags.length > 0) {
+        const tagInsertData = selectedTags.map(tag => ({
+          subject_id: subject.id,
+          tag
+        }))
+        
+        const { error: tagError } = await supabase
+          .from('tag_votes')
+          .insert(tagInsertData)
+
+        if (tagError) {
+          console.error('Tag vote insert error2:', JSON.stringify(tagError, null, 2));
         }
       }
 

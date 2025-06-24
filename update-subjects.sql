@@ -34,4 +34,5 @@ INSERT INTO subjects (name) VALUES
   ('Mobile Computing'),
   ('Cloud Computing'),
   ('Semantic Web Mining'),
-  ('Data Visualization');
+  ('Data Visualization'),
+  ('North American Art History');

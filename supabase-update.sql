@@ -35,6 +35,12 @@ CREATE POLICY "Anyone can insert votes" ON votes
 CREATE POLICY "Users can only update their own votes" ON votes
   FOR UPDATE USING (auth.uid()::text = user_id::text);
 
+CREATE POLICY "Anyone can insert tag votes" ON tag_votes
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Anyone can read tag votes" ON tag_votes
+  FOR SELECT USING (true);
+
 -- Step 6: Update or create the stats function
 CREATE OR REPLACE FUNCTION get_subject_stats(subject_uuid UUID)
 RETURNS TABLE (
@@ -56,7 +62,15 @@ BEGIN
       '-1', COUNT(CASE WHEN v.vote_value = -1 THEN 1 END),
       '1', COUNT(CASE WHEN v.vote_value = 1 THEN 1 END),
       '2', COUNT(CASE WHEN v.vote_value = 2 THEN 1 END)
-    ) as vote_distribution
+    ) as vote_distribution,
+    (
+      SELECT json_object_agg(tag, tag_count) FROM (
+        SELECT tag, COUNT(*) as tag_count
+        FROM tag_votes
+        WHERE subject_id = s.id
+        GROUP BY tag
+      ) sub
+    ) AS tags
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id
   WHERE s.id = subject_uuid
