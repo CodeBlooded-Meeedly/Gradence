@@ -6,7 +6,7 @@ import { Leaderboard } from './components/Leaderboard'
 import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
 import Select from "react-select"
-import { customSelectStyles, customSelectStyles2 } from './lib/styleUtils'
+import { customSelectStyles2 } from './lib/styleUtils'
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
@@ -210,7 +210,7 @@ function App() {
         {/* search bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-red-500/30 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-2">
                 <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
             </div>
 
@@ -230,7 +230,7 @@ function App() {
                   <p className="mb-2">By major:</p>
                   {/* TODO: add major filter here */}
                 </div>
-                
+
                 <div className="w-1/3">
                   <p className="mb-2">Contains tags:</p>
                   <Select
