@@ -61,6 +61,8 @@ function App() {
     const subset = subjects.filter(subject => {
       const subject_name = subject.name.trim().toLowerCase()
       return subject_name.includes(courseQuery.trim().toLowerCase())
+    }).filter(subject => {
+      return tagQuery.every(tag => subject.tags.includes(tag))
     })
     return subset
   }
@@ -262,6 +264,7 @@ function App() {
                 <SubjectCard 
                   key={subject.id} 
                   subject={subject} 
+                  tags={tags}
                   onVoteSubmitted={handleVoteSubmitted}
                 />
               ))}

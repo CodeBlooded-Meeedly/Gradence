@@ -8,14 +8,13 @@ import { useRef } from 'react'
 
 interface SubjectCardProps {
   subject: Subject
+  tags: string[]
   onVoteSubmitted?: () => void
 }
 
 const emojis = ['💀', '😴', '❤️', '🔥']
 const labels = ['Way too hard', 'Too boring', 'Loved the subject', 'Super Fun']
 const values = [-2, -1, 1, 2]
-const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
-const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 
 function ConfettiOverlay() {
   const canvasRef = useRef(null);
@@ -34,7 +33,9 @@ function ConfettiOverlay() {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-30" />;
 }
 
-export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
+export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps) => {
+  const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
+
   const [stats, setStats] = useState<SubjectStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [hasUserVoted, setHasUserVoted] = useState(false)
@@ -117,7 +118,7 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
           .insert(tagInsertData)
 
         if (tagError) {
-          console.error('Tag vote insert error2:', JSON.stringify(tagError, null, 2));
+          console.error('Tag vote insert error:', JSON.stringify(tagError, null, 2));
         }
       }
 
@@ -135,6 +136,7 @@ export const SubjectCard = ({ subject, onVoteSubmitted }: SubjectCardProps) => {
       }
 
       await loadStats()
+      console.log(stats)
       
       // Notify parent component that a vote was submitted
       if (onVoteSubmitted) {
