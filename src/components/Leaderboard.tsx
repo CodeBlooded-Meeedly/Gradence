@@ -126,19 +126,19 @@ export const Leaderboard = () => {
       {overallStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-black/60 rounded-xl p-4 text-center border border-red-500/30">
-            <div className="text-2xl font-bold text-white">{overallStats.total_subjects}</div>
+            <div className="text-5xl font-bold text-white">{overallStats.total_subjects}</div>
             <div className="text-xs text-gray-400">Subjects</div>
           </div>
           <div className="bg-black/60 rounded-xl p-4 text-center border border-red-500/30">
-            <div className="text-2xl font-bold text-white">{overallStats.total_votes}</div>
+            <div className="text-5xl font-bold text-white">{overallStats.total_votes}</div>
             <div className="text-xs text-gray-400">Total Votes</div>
           </div>
           <div className="bg-black/60 rounded-xl p-4 text-center border border-red-500/30">
-            <div className="text-2xl font-bold text-white">{overallStats.total_users}</div>
+            <div className="text-5xl font-bold text-white">{overallStats.total_users}</div>
             <div className="text-xs text-gray-400">Voters</div>
           </div>
           <div className="bg-black/60 rounded-xl p-4 text-center border border-red-500/30">
-            <div className="text-2xl font-bold text-red-400">{overallStats.average_vote}</div>
+            <div className="text-5xl font-bold text-red-400">{overallStats.average_vote}</div>
             <div className="text-xs text-gray-400">Avg Rating</div>
           </div>
         </div>
