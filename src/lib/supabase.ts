@@ -13,6 +13,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface Subject {
   id: string
   name: string
+  major?: string
   created_at: string
   updated_at: string
 }
