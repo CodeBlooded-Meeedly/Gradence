@@ -37,6 +37,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
   const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 
   const [stats, setStats] = useState<SubjectStats | null>(null)
+  const [topTags, setTopTags] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [hasUserVoted, setHasUserVoted] = useState(false)
   const [canVoteAgain, setCanVoteAgain] = useState(false)
@@ -60,9 +61,19 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
       
       if (error) throw error
       if (data && data.length > 0) {
-        console.log(data[0])
         setStats(data[0])
       }
+
+      // top tags
+      const tagDistribution = data[0].tags
+      const top3Tags = tagDistribution ?
+        Object.entries(tagDistribution as Record<string, number>)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 3)
+          .map(([key]) => key)
+        : []
+      setTopTags(top3Tags)
+
     } catch (error) {
       console.error('Error loading stats:', error)
     }
@@ -208,6 +219,15 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
             </div>
           </div>
         </div>
+
+        {/* display top tags */}
+        {topTags.length != 0 && (
+          <div className="flex">
+            {topTags.map(tag => {
+              return <p className="inline-block bg-[#b06dcd]/50 px-2 py-1 rounded mb-6 mr-2 text-sm">{tag}</p>
+            })}
+          </div>
+        )}
 
         {/* Voting Section */}
         {localStorage.getItem('double-vote-powerup') === 'true' && !hasUserVoted && (

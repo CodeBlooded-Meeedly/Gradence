@@ -35,16 +35,15 @@ function App() {
     }
   }, [])
 
-  // useEffect(() => {
-  //   setFilteredSubjects(getFilteredSubjects())
-  // }, [courseQuery, selectedMajor]) //added selectedMajor to dependencies
-
   useEffect(() => {
-  const nameFiltered = getFilteredSubjects()
-  const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
-  setFilteredSubjects(majorFiltered)
-}, [courseQuery, selectedMajor])
-
+    const nameFiltered = getFilteredSubjectsByName()
+    const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
+    const filterByTag = async () => {
+      const filtered = await getFilteredSubjectsByTags(majorFiltered)
+      setFilteredSubjects(filtered)
+    }
+    filterByTag()
+  }, [courseQuery, selectedMajor, tagQuery])
 
   const loadSubjects = async () => {
     try {
@@ -71,21 +70,45 @@ function App() {
     }
   }
 
-  // returns list of subjects matching search criteria
-  const getFilteredSubjects = () => {
+  // returns list of subjects containing searched name
+  const getFilteredSubjectsByName = () => {
     const subset = subjects.filter(subject => {
       const subject_name = subject.name.trim().toLowerCase()
       return subject_name.includes(courseQuery.trim().toLowerCase())
-    }).filter(subject => {
-      return tagQuery.every(tag => subject.tags.includes(tag))
     })
     return subset
   }
 
-  // returns list of subjects matching search criteria by major
+  // returns list of subjects matching searched major
   const getFilteredSubjectsByMajor = (subjectList: Subject[]) => {
     if (!selectedMajor) return subjectList
     return subjectList.filter(subject => subject.major?.toLowerCase() === selectedMajor.toLowerCase())
+  }
+
+  // returns list of subjects containing all searched tags
+  const getFilteredSubjectsByTags = async (subjectList: Subject[]) => {
+    const filtered = await Promise.all(
+      subjectList.map(async (subject) => {
+        const { data, error } = await supabase.rpc('get_subject_stats', { subject_uuid: subject.id });
+        
+        if (error) {
+          console.log("error fetching stats for", subject.name)
+          return null
+        }
+
+        const tags = data[0].tags
+        const topTags = tags ? 
+          Object.entries(tags as Record<string, number>)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3)
+            .map(([key]) => key)
+          : []
+
+        return tagQuery.every(tag => topTags.includes(tag)) ? subject : null
+      })
+    )
+
+    return filtered.filter(Boolean) as Subject[]
   }
 
   const handleVoteSubmitted = () => {
