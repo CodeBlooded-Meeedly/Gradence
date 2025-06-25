@@ -5,12 +5,13 @@ import { SubjectCard } from './components/SubjectCard'
 import { Leaderboard } from './components/Leaderboard'
 import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
-import Select from "react-select"
-import { customSelectStyles2 } from './lib/styleUtils'
+import Select, { type SingleValue } from "react-select"
+import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
 const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
+type OptionType = { label: string; value: string };
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
@@ -296,12 +297,12 @@ function App() {
                 <div className="w-1/3">
                   <p className="mb-2">By major:</p>
                   <div className="w-5/6">
-                    <Select
+                    <Select<OptionType, false>
                       options={majorOptions.map(m => ({ label: m, value: m }))}
                       value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
-                      onChange={(selected) => setSelectedMajor(selected?.value || null)}
+                      onChange={(selected: SingleValue<OptionType>) => setSelectedMajor(selected?.value || null)}
                       placeholder="Select a major"
-                      styles={customSelectStyles2}
+                      styles={customSingleSelectStyle}
                       className="react-select"
                     />
                   </div>
