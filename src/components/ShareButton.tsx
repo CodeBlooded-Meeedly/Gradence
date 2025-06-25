@@ -71,15 +71,23 @@ export const ShareButton = ({ className = '' }: ShareButtonProps) => {
       {/* Main Share Button */}
       <button
         onClick={() => setShowShareMenu(!showShareMenu)}
-        className="group relative flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
+        className="group relative flex items-center gap-1.5 sm:gap-2 
+                  bg-gradient-to-r from-red-600 to-red-700 
+                  hover:from-red-700 hover:to-red-800 
+                  text-white 
+                  px-2 sm:px-4 py-1 sm:py-2 
+                  text-xs sm:text-sm 
+                  rounded-xl transition-all duration-300 
+                  shadow-lg hover:shadow-xl hover:scale-105 transform 
+                  min-w-[64px]"
       >
         {/* Animated background effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
         
         {/* Content */}
-        <div className="relative flex items-center gap-2">
-          <span className="text-lg animate-pulse">📤</span>
-          <span className="font-semibold text-sm">Share</span>
+        <div className="relative flex items-center gap-1 sm:gap-2">
+          <span className="text-sm sm:text-base animate-pulse">📤</span>
+          <span className="font-semibold">Share</span>
           <svg 
             className={`w-4 h-4 transition-transform duration-300 ${showShareMenu ? 'rotate-180' : ''}`} 
             fill="none" 
