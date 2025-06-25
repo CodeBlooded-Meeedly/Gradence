@@ -119,24 +119,37 @@ function App() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-b border-red-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
+
+          {/* Left logo */}
           <div className="flex items-center">
             <a href="https://www.linkedin.com/company/global-summer-challenge/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <img src="/By Meeedly.png" alt="By Meeedly" className="h-10 w-auto" />
             </a>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Buttons */}
+          <div className="flex items-center gap-3">
             <ShareButton />
             <button
               onClick={() => setIsSpinWheelModalOpen(true)}
-              className="group relative flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-4 py-2.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
+              className="group relative flex items-center gap-1.5 
+                        bg-gradient-to-r from-yellow-500 to-orange-500 
+                        hover:from-yellow-600 hover:to-orange-600 
+                        text-white 
+                        px-2 sm:px-4 py-1 sm:py-2 
+                        text-xs sm:text-sm 
+                        rounded-xl transition-all duration-300 
+                        shadow-lg hover:shadow-xl hover:scale-105 transform 
+                        min-w-[64px]"
               title="Spin the Daily Wheel!"
             >
-              <span className="text-lg animate-spin" style={{ animationDuration: '3s' }}>🎡</span>
-              <span className="font-semibold text-sm">Spin</span>
+              <span className="text-xs animate-spin" style={{ animationDuration: '3s' }}>🎡</span>
+              <span className="font-semibold">Spin</span>
             </button>
+
+            {/* Right logo */}
             <a href="https://www.linkedin.com/company/meeedly/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Anonymous Subject Voter Logo" className="h-10 w-auto" />
+              <img src="/logo.png" alt="Meeedly Logo" className="h-10 w-full"/>
             </a>
           </div>
         </div>
@@ -230,8 +243,17 @@ function App() {
       <SpinWheel isOpen={isSpinWheelModalOpen} onClose={() => setIsSpinWheelModalOpen(false)} />
       
       <main className="relative pt-20">
+        
         <div className="text-center py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
           <div className="relative z-10 max-w-4xl mx-auto">
+            <div className ="pb-px">
+              <p>
+                This application is developed as part of the
+                <a href="https://www.linkedin.com/showcase/global-summer-challenge/posts/" target="_blank" rel="noopener noreferrer"> Global Summer Challenge </a>
+                organized
+                <a href="https://www.linkedin.com/company/meeedly/posts/" target="_blank" rel="noopener noreferrer"> by Meeedly. </a>
+              </p>
+            </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-4 font-display">
               Gradence: Anonymous Subject Voter
             </h1>
@@ -242,7 +264,6 @@ function App() {
               Help improve education by sharing your honest feedback. Your votes are completely anonymous! 🚀
             </p>
           </div>
-          
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
@@ -263,8 +284,8 @@ function App() {
             <div className="flex">
                 <div className="w-1/3">
                   <p className="mb-2">By name:</p>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Course name"
                     value={courseQuery}
                     onChange={(e) => setCourseQuery(e.target.value)}
