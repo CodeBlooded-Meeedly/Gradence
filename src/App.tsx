@@ -14,6 +14,8 @@ const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [majorOptions, setMajorOptions] = useState<string[]>([]) // stores unique majors for filtering
+  const [selectedMajor, setSelectedMajor] = useState<string | null>(null) //allows filtering by major
   const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,9 +35,16 @@ function App() {
     }
   }, [])
 
+  // useEffect(() => {
+  //   setFilteredSubjects(getFilteredSubjects())
+  // }, [courseQuery, selectedMajor]) //added selectedMajor to dependencies
+
   useEffect(() => {
-    setFilteredSubjects(getFilteredSubjects())
-  }, [courseQuery])
+  const nameFiltered = getFilteredSubjects()
+  const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
+  setFilteredSubjects(majorFiltered)
+}, [courseQuery, selectedMajor])
+
 
   const loadSubjects = async () => {
     try {
@@ -48,6 +57,12 @@ function App() {
       if (error) throw error
       setSubjects(data || [])
       setFilteredSubjects(data || [])
+
+      const uniqueMajors = Array.from( // extract unique majors from subjects
+        new Set((data || []).map(subject => subject.major).filter(Boolean))
+      )
+      setMajorOptions(uniqueMajors)
+
     } catch (err) {
       console.error('Error loading subjects:', err)
       setError('Failed to load subjects. Please check your Supabase configuration.')
@@ -63,6 +78,12 @@ function App() {
       return subject_name.includes(courseQuery.trim().toLowerCase())
     })
     return subset
+  }
+
+  // returns list of subjects matching search criteria by major
+  const getFilteredSubjectsByMajor = (subjectList: Subject[]) => {
+    if (!selectedMajor) return subjectList
+    return subjectList.filter(subject => subject.major?.toLowerCase() === selectedMajor.toLowerCase())
   }
 
   const handleVoteSubmitted = () => {
@@ -249,9 +270,18 @@ function App() {
 
                 <div className="w-1/3">
                   <p className="mb-2">By major:</p>
-                  {/* TODO: add major filter here */}
+                  <div className="w-5/6">
+                    <Select
+                      options={majorOptions.map(m => ({ label: m, value: m }))}
+                      value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
+                      onChange={(selected) => setSelectedMajor(selected?.value || null)}
+                      placeholder="Select a major"
+                      styles={customSelectStyles2}
+                      className="react-select"
+                    />
+                  </div>
                 </div>
-                
+
                 <div className="w-1/3">
                   <p className="mb-2">Contains tags:</p>
                   <Select
