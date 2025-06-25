@@ -48,7 +48,8 @@ RETURNS TABLE (
   subject_name TEXT,
   total_votes BIGINT,
   average_vote NUMERIC,
-  vote_distribution JSON
+  vote_distribution JSON,
+  tags JSON
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -67,7 +68,7 @@ BEGIN
       SELECT json_object_agg(tag, tag_count) FROM (
         SELECT tag, COUNT(*) as tag_count
         FROM tag_votes
-        WHERE subject_id = s.id
+        WHERE tag_votes.subject_id = s.id
         GROUP BY tag
       ) sub
     ) AS tags
