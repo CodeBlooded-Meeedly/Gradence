@@ -7,6 +7,12 @@ import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
 import Select, { type SingleValue } from "react-select"
 import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
+import nayshaHeadshot from './assets/nayshaheadshot.png';
+import hetaviHeadshot from './assets/hetaviheadshot.jpg';
+import bryanHeadshot from './assets/bryanheadshot.jpg';
+import rylanHeadshot from './assets/rylanheadshot.png';
+import mulanHeadshot from './assets/mulanheadshot.png';
+import jaronHeadshot from './assets/jaronheadshot.jpg';
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
@@ -270,6 +276,59 @@ function App() {
             <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
               💀 = <b>-2</b> pts&nbsp;&nbsp;&nbsp;😴 = <b>-1</b> pt&nbsp;&nbsp;&nbsp;❤️ = <b>+1</b> pt&nbsp;&nbsp;&nbsp;🔥 = <b>+2</b> pts
             </p>
+            <h2 className="text-2xl sm:text-3xl text-red-300 mb-8 font-light">
+              Contributors
+            </h2>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+              <a href="https://www.linkedin.com/in/naysha-jain/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={nayshaHeadshot} alt="Naysha's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Naysha Jain</p>
+                  <p className="text-white text-sm">Leader</p>
+                  <p className="text-gray-300 text-sm">Knox College</p>
+                </div>
+              </a>
+              <a href="https://www.linkedin.com/in/hetavimehta22/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={hetaviHeadshot} alt="Hetavi's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Hetavi Mehta</p>
+                  <p className="text-white text-sm">Lead Programmer</p>
+                  <p className="text-gray-300 text-sm">Arizona State University</p>
+                </div>
+              </a>
+              <a href="https://www.linkedin.com/in/bgarciacs/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={bryanHeadshot} alt="Bryan's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Bryan Garcia</p>
+                  <p className="text-white text-sm">Lead Marketer</p>
+                  <p className="text-gray-300 text-sm">DePaul University</p>
+                </div>
+              </a>
+              <a href="https://www.linkedin.com/in/rylanhurtado/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={rylanHeadshot} alt="Rylan's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Rylan Hurtado</p>
+                  <p className="text-white text-sm">Advisor</p>
+                  <p className="text-gray-300 text-sm">DePaul University</p>
+                </div>
+              </a>
+              <a href="https://www.linkedin.com/in/mulan-liu-542071260/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={mulanHeadshot} alt="Mulan's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Mulan Liu</p>
+                  <p className="text-white text-sm">Member</p>
+                  <p className="text-gray-300 text-sm">University of Wisconsin-Madison</p>
+                </div>
+              </a>
+              <a href="https://www.linkedin.com/in/jaron-lin/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
+                <div className="flex flex-col items-center">
+                  <img src={jaronHeadshot} alt="Jaron's Headshot" className="h-20 w-auto rounded-xl" />
+                  <p className="text-300 text-sm mt-2">Jaron Lin</p>
+                  <p className="text-white text-sm">Member</p>
+                  <p className="text-gray-300 text-sm">Cal Poly Pomona</p>
+                </div>
+              </a>
+            </div>
           </div>
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
