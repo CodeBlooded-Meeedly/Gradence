@@ -30,6 +30,9 @@ function App() {
   const [isSpinWheelModalOpen, setIsSpinWheelModalOpen] = useState(false)
   const [courseQuery, setCourseQuery] = useState<string>('')
   const [tagQuery, setTagQuery] = useState<string[]>([])
+  const [universityOptions, setUniversityOptions] = useState<string[]>([])
+  const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null)
+
 
   useEffect(() => {
     loadSubjects()
@@ -45,12 +48,14 @@ function App() {
   useEffect(() => {
     const nameFiltered = getFilteredSubjectsByName()
     const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
+    const universityFiltered = getFilteredSubjectsByUniversity(majorFiltered)
     const filterByTag = async () => {
-      const filtered = await getFilteredSubjectsByTags(majorFiltered)
-      setFilteredSubjects(filtered)
+      const final = await getFilteredSubjectsByTags(universityFiltered)
+      setFilteredSubjects(final)
     }
+    
     filterByTag()
-  }, [courseQuery, selectedMajor, tagQuery])
+  }, [courseQuery, selectedMajor, selectedUniversity, tagQuery])
 
   const loadSubjects = async () => {
     try {
@@ -69,6 +74,11 @@ function App() {
       )
       setMajorOptions(uniqueMajors)
 
+      const uniqueUniversities = Array.from(
+        new Set((data || []).map(s => s.university).filter(Boolean))
+      )
+      setUniversityOptions(uniqueUniversities)
+
     } catch (err) {
       console.error('Error loading subjects:', err)
       setError('Failed to load subjects. Please check your Supabase configuration.')
@@ -84,6 +94,14 @@ function App() {
       return subject_name.includes(courseQuery.trim().toLowerCase())
     })
     return subset
+  }
+
+  // returns list of uninversities containing searched name
+  const getFilteredSubjectsByUniversity = (list: Subject[]) => {
+    if (!selectedUniversity) return list
+    return list.filter(
+      s => s.university?.toLowerCase() === selectedUniversity.toLowerCase()
+    )
   }
 
   // returns list of subjects matching searched major
@@ -358,6 +376,26 @@ function App() {
                     className="rounded-md px-4 py-2 w-5/6"
                   />
                 </div>
+
+                <div className="w-1/3">
+                  <p className="mb-2">By university:</p>
+                  <div className="w-5/6">
+                    <Select<OptionType, false>
+                      options={universityOptions.map(u => ({ label: u, value: u }))}
+                      value={
+                        selectedUniversity
+                          ? { label: selectedUniversity, value: selectedUniversity }
+                          : null
+                      }
+                      onChange={(v: SingleValue<OptionType>) =>
+                        setSelectedUniversity(v?.value || null)
+                      }
+                      placeholder="Select a university"
+                      styles={customSingleSelectStyle}
+                      className="react-select"
+                    />
+                  </div>
+              </div>
 
                 <div className="w-1/3">
                   <p className="mb-2">By major:</p>
