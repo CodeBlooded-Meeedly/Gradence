@@ -78,7 +78,6 @@ function getCardsPerView() {
 export const TeamCarousel = () => {
   const [isPaused, setIsPaused] = useState(false)
   const [cardsPerView, setCardsPerView] = useState(getCardsPerView())
-  const [containerWidth, setContainerWidth] = useState(0)
   const [cardWidth, setCardWidth] = useState(0)
   const [translateX, setTranslateX] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -95,7 +94,6 @@ export const TeamCarousel = () => {
   useEffect(() => {
     if (containerRef.current) {
       const width = containerRef.current.offsetWidth
-      setContainerWidth(width)
       setCardWidth(width / cardsPerView)
     }
   }, [cardsPerView])
