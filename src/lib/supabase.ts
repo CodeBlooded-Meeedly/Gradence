@@ -14,6 +14,7 @@ export interface Subject {
   id: string
   name: string
   major?: string
+  university: string
   created_at: string
   updated_at: string
 }
