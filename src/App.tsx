@@ -3,16 +3,11 @@ import { supabase } from './lib/supabase'
 import type { Subject } from './lib/supabase'
 import { SubjectCard } from './components/SubjectCard'
 import { Leaderboard } from './components/Leaderboard'
+import { TeamCarousel } from './components/TeamCarousel'
 import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
 import Select, { type SingleValue } from "react-select"
 import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
-import nayshaHeadshot from './assets/nayshaheadshot.png';
-import hetaviHeadshot from './assets/hetaviheadshot.jpg';
-import bryanHeadshot from './assets/bryanheadshot.jpg';
-import rylanHeadshot from './assets/rylanheadshot.png';
-import mulanHeadshot from './assets/mulanheadshot.png';
-import jaronHeadshot from './assets/jaronheadshot.jpg';
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
@@ -143,38 +138,38 @@ function App() {
   const Header = () => (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-b border-red-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-y-2">
 
           {/* Left logo */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0">
             <a href="https://www.linkedin.com/company/global-summer-challenge/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-              <img src="/By Meeedly.png" alt="By Meeedly" className="h-10 w-auto" />
+              <img src="/By Meeedly.png" alt="By Meeedly" className="h-10 w-auto flex-shrink-0" />
             </a>
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
             <ShareButton />
             <button
               onClick={() => setIsSpinWheelModalOpen(true)}
-              className="group relative flex items-center gap-1.5 
-                        bg-gradient-to-r from-yellow-500 to-orange-500 
-                        hover:from-yellow-600 hover:to-orange-600 
-                        text-white 
-                        px-2 sm:px-4 py-1 sm:py-2 
-                        text-xs sm:text-sm 
-                        rounded-xl transition-all duration-300 
-                        shadow-lg hover:shadow-xl hover:scale-105 transform 
-                        min-w-[64px]"
+              className="group relative flex items-center gap-1.5
+                        bg-gradient-to-r from-yellow-500 to-orange-500
+                        hover:from-yellow-600 hover:to-orange-600
+                        text-white
+                        px-2 sm:px-4 py-1 sm:py-2
+                        text-xs sm:text-sm
+                        rounded-xl transition-all duration-300
+                        shadow-lg hover:shadow-xl hover:scale-105 transform
+                        min-w-[40px] sm:min-w-[64px]"
               title="Spin the Daily Wheel!"
             >
               <span className="text-xs animate-spin" style={{ animationDuration: '3s' }}>🎡</span>
-              <span className="font-semibold">Spin</span>
+              <span className="font-semibold hidden xs:inline sm:inline">Spin</span>
             </button>
 
             {/* Right logo */}
-            <a href="https://www.linkedin.com/company/meeedly/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Meeedly Logo" className="h-10 w-full"/>
+            <a href="https://www.linkedin.com/company/meeedly/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity flex-shrink-0">
+              <img src="/logo.png" alt="Meeedly Logo" className="h-10 w-auto flex-shrink-0"/>
             </a>
           </div>
         </div>
@@ -185,19 +180,11 @@ function App() {
   const Footer = () => (
     <footer className="bg-black/95 border-t border-red-500/20 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">About Gradence</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              This application is developed as part of the Global Summer Challenge organized by Meeedly. Gradence is a platform designed to gather honest, anonymous feedback about your learning experience.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Disclaimer</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              This program is intended solely for fun and interactive engagement. It does not reflect any official academic evaluation.
-            </p>
-          </div>
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-4">Disclaimer</h3>
+          <p className="text-gray-300 text-sm leading-relaxed">
+            This program is intended solely for fun and interactive engagement. It does not reflect any official academic evaluation.
+          </p>
         </div>
         <div className="mt-8 pt-8 border-t border-red-500/20">
           <div className="flex items-center justify-between">
@@ -217,7 +204,7 @@ function App() {
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
               </a>
-              <p className="text-xs text-gray-400">Version 3.0.1</p>
+              <p className="text-xs text-gray-400">Version 3.1.0</p>
             </div>
           </div>
         </div>
@@ -294,64 +281,15 @@ function App() {
             <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
               💀 = <b>-2</b> pts&nbsp;&nbsp;&nbsp;😴 = <b>-1</b> pt&nbsp;&nbsp;&nbsp;❤️ = <b>+1</b> pt&nbsp;&nbsp;&nbsp;🔥 = <b>+2</b> pts
             </p>
-            <h2 className="text-2xl sm:text-3xl text-red-300 mb-8 font-light">
-              Contributors
-            </h2>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-              <a href="https://www.linkedin.com/in/naysha-jain/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={nayshaHeadshot} alt="Naysha's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Naysha Jain</p>
-                  <p className="text-white text-sm">Leader</p>
-                  <p className="text-gray-300 text-sm">Knox College</p>
-                </div>
-              </a>
-              <a href="https://www.linkedin.com/in/hetavimehta22/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={hetaviHeadshot} alt="Hetavi's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Hetavi Mehta</p>
-                  <p className="text-white text-sm">Lead Programmer</p>
-                  <p className="text-gray-300 text-sm">Arizona State University</p>
-                </div>
-              </a>
-              <a href="https://www.linkedin.com/in/bgarciacs/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={bryanHeadshot} alt="Bryan's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Bryan Garcia</p>
-                  <p className="text-white text-sm">Lead Marketer</p>
-                  <p className="text-gray-300 text-sm">DePaul University</p>
-                </div>
-              </a>
-              <a href="https://www.linkedin.com/in/rylanhurtado/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={rylanHeadshot} alt="Rylan's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Rylan Hurtado</p>
-                  <p className="text-white text-sm">Advisor</p>
-                  <p className="text-gray-300 text-sm">DePaul University</p>
-                </div>
-              </a>
-              <a href="https://www.linkedin.com/in/mulan-liu-542071260/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={mulanHeadshot} alt="Mulan's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Mulan Liu</p>
-                  <p className="text-white text-sm">Member</p>
-                  <p className="text-gray-300 text-sm">University of Wisconsin-Madison</p>
-                </div>
-              </a>
-              <a href="https://www.linkedin.com/in/jaron-lin/" target="_blank" rel="noopener noreferrer" className="bg-black/60 rounded-xl p-4 border border-red-500/30">
-                <div className="flex flex-col items-center">
-                  <img src={jaronHeadshot} alt="Jaron's Headshot" className="h-20 w-auto rounded-xl" />
-                  <p className="text-300 text-sm mt-2">Jaron Lin</p>
-                  <p className="text-white text-sm">Member</p>
-                  <p className="text-gray-300 text-sm">Cal Poly Pomona</p>
-                </div>
-              </a>
-            </div>
           </div>
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
           </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <TeamCarousel />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
