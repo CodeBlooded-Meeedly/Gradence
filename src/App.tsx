@@ -264,6 +264,12 @@ function App() {
             <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
               Help improve education by sharing your honest feedback. Your votes are completely anonymous! 🚀
             </p>
+            <p className="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+              Gradence uses weighted voting to help you evaluate classes:
+            </p>
+            <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
+              💀 = <b>-2</b> pts&nbsp;&nbsp;&nbsp;😴 = <b>-1</b> pt&nbsp;&nbsp;&nbsp;❤️ = <b>+1</b> pt&nbsp;&nbsp;&nbsp;🔥 = <b>+2</b> pts
+            </p>
           </div>
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 mix-blend-multiply"></div>
