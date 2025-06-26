@@ -150,7 +150,7 @@ export const ChartGallery = ({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gradient mb-2">{chart.title}</h2>
-              <p className="text-gray-300 text-sm">{chart.description}</p>
+              <p className="text-gray-300 text-base">{chart.description}</p>
             </div>
             <button
               onClick={() => setSelectedChart(null)}
@@ -171,7 +171,7 @@ export const ChartGallery = ({
     <div className="bg-black/80 rounded-2xl p-6 border border-red-500/30 shadow-2xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gradient mb-2">📊 Chart Gallery</h2>
-        <p className="text-gray-300 text-sm">Interactive visualizations of voting data</p>
+        <p className="text-gray-300 text-base">Interactive visualizations of voting data</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -189,7 +189,7 @@ export const ChartGallery = ({
                 →
               </div>
             </div>
-            <p className="text-gray-300 text-sm mb-4">{chart.description}</p>
+            <p className="text-gray-300 text-base mb-4">{chart.description}</p>
             
             {/* Mini preview */}
             <div className="h-24 bg-gradient-to-br from-red-500/20 to-red-400/20 rounded-lg flex items-center justify-center">
