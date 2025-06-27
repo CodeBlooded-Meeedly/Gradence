@@ -46,6 +46,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
   const [feedback, setFeedback] = useState('')
   const [showTooltip, setShowTooltip] = useState<number | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedVote, setSelectedVote] = useState<number | null>(null)
 
   useEffect(() => {
     loadStats()
@@ -79,8 +80,12 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
     }
   }
 
-  const handleVote = async (voteValue: number) => {
-    if (hasUserVoted && !canVoteAgain) return
+  const handleVoteSelection = (voteValue: number) => {
+    setSelectedVote(voteValue)
+  }
+
+  const handleSubmitVote = async () => {
+    if (selectedVote === null || (hasUserVoted && !canVoteAgain)) return
 
     setLoading(true)
     try {
@@ -91,7 +96,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
       const votePayload = {
         user_id: userId,
         subject_id: subject.id,
-        vote_value: voteValue,
+        vote_value: selectedVote,
         feedback: feedback.trim() || null,
         fingerprint_id: fingerprintId,
         vote_weight: voteWeight
@@ -107,7 +112,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
           error,
           userId,
           subjectId: subject.id,
-          voteValue
+          voteValue: selectedVote
         })
         // Handle unique constraint violation gracefully
         if (error.code === '23505') { // unique_violation
@@ -134,7 +139,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
       }
 
       console.log('Vote submitted successfully:', data)
-      storeVote(subject.id, voteValue)
+      storeVote(subject.id, selectedVote)
       setHasUserVoted(true)
 
       // Remove power-ups after use
@@ -154,20 +159,27 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
         onVoteSubmitted()
       }
       
-      if (voteValue > 0) {
+      if (selectedVote > 0) {
         setShowCelebration(true)
         // Launch confetti on the card itself
         setTimeout(() => setShowCelebration(false), 2500)
-      } else if (voteValue < 0) {
+      } else if (selectedVote < 0) {
         setShowSad(true)
         setTimeout(() => setShowSad(false), 2500)
       }
+
+      // Reset vote selection
+      setSelectedVote(null)
     } catch (error) {
       console.error('Error voting:', error)
       alert('Failed to submit vote. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCancelVote = () => {
+    setSelectedVote(null)
   }
 
   const getCoolOMeterPercentage = () => {
@@ -246,11 +258,15 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
               {emojis.map((emoji, index) => (
                 <button
                   key={index}
-                  onClick={() => handleVote(values[index])}
+                  onClick={() => handleVoteSelection(values[index])}
                   onMouseEnter={() => setShowTooltip(index)}
                   onMouseLeave={() => setShowTooltip(null)}
                   disabled={loading}
-                  className="relative group flex flex-col items-center p-4 rounded-2xl bg-black/60 border-2 border-red-500/30 hover:border-red-500/60 hover:bg-gradient-to-br hover:from-red-500/20 hover:to-red-400/20 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110"
+                  className={`relative group flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 ${
+                    selectedVote === values[index]
+                      ? 'bg-gradient-to-br from-red-500/40 to-red-400/40 border-red-500/80 scale-105'
+                      : 'bg-black/60 border-red-500/30 hover:border-red-500/60 hover:bg-gradient-to-br hover:from-red-500/20 hover:to-red-400/20'
+                  }`}
                 >
                   <span className="text-3xl sm:text-4xl">{emoji}</span>
                   {showTooltip === index && (
@@ -288,6 +304,24 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
               <div className="text-right text-sm text-gray-400">
                 {feedback.length}/200
               </div>
+            </div>
+
+            {/* Always show submit button */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <button
+                onClick={handleSubmitVote}
+                disabled={loading || selectedVote === null}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              >
+                {loading ? 'Submitting...' : 'Submit Vote'}
+              </button>
+              <button
+                onClick={handleCancelVote}
+                disabled={loading}
+                className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         ) : (
