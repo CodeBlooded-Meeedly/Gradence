@@ -8,11 +8,14 @@ import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
 import Select, { type SingleValue } from "react-select"
 import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
+import { Pagination } from "react-bootstrap"
+import './lib/customPagination.css'
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
 const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 type OptionType = { label: string; value: string };
+const itemsPerPage = 9
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
@@ -27,7 +30,8 @@ function App() {
   const [tagQuery, setTagQuery] = useState<string[]>([])
   const [universityOptions, setUniversityOptions] = useState<string[]>([])
   const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null)
-
+  const [totalPages, setTotalPages] = useState(1)
+  const [curPage, setCurPage] = useState(1)
 
   useEffect(() => {
     loadSubjects()
@@ -47,6 +51,7 @@ function App() {
     const filterByTag = async () => {
       const final = await getFilteredSubjectsByTags(universityFiltered)
       setFilteredSubjects(final)
+      setTotalPages(Math.ceil(final.length/itemsPerPage))
     }
     
     filterByTag()
@@ -63,6 +68,7 @@ function App() {
       if (error) throw error
       setSubjects(data || [])
       setFilteredSubjects(data || [])
+      setTotalPages(Math.ceil(data.length/itemsPerPage))
 
       const uniqueMajors = Array.from( // extract unique majors from subjects
         new Set((data || []).map(subject => subject.major).filter(Boolean))
@@ -376,7 +382,7 @@ function App() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredSubjects.map((subject) => (
+              {filteredSubjects.slice((curPage-1)*itemsPerPage, curPage*itemsPerPage).map((subject) => (
                 <SubjectCard 
                   key={subject.id} 
                   subject={subject} 
@@ -387,6 +393,19 @@ function App() {
             </div>
           )}
         </div>
+
+        <div className='flex justify-center rounded-lg inline-block'>
+          <Pagination className='my-pagination'> 
+            <Pagination.Prev disabled={curPage==1} onClick={() => setCurPage(curPage-1)}>Previous</Pagination.Prev>
+            {
+              Array.from({length: totalPages}, (_, i) => i + 1).map(pgNumber => 
+                <Pagination.Item key={pgNumber} active={curPage==pgNumber} onClick={() => setCurPage(pgNumber)}>{pgNumber}</Pagination.Item>
+              )
+            }
+            <Pagination.Next disabled={curPage==totalPages} onClick={() => setCurPage(curPage+1)}>Next</Pagination.Next>
+          </Pagination>
+        </div>
+
       </main>
 
       <Footer />
