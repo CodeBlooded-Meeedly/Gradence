@@ -97,6 +97,9 @@ export default function AddCourseModal({isOpen, onClose, onSubmit, schools, majo
 
         if (err) {
             console.error('error submitting subject')
+            // TODO: edit this error in future if needed
+            alert('Error submitting course, likely because another course with the same name already exists. Try another course instead!')
+            onClose()
             return
         }
 
