@@ -33,7 +33,7 @@ function App() {
   const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null)
   const [totalPages, setTotalPages] = useState(1)
   const [curPage, setCurPage] = useState(1)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
 
   useEffect(() => {
     loadSubjects()
@@ -390,7 +390,7 @@ function App() {
             <div className='flex items-center'>
               <p className='mb-2 mr-4 inline-block'>Don't see your course?</p>
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsCourseModalOpen(true)}
                 className="px-3 py-2 bg-red-700 rounded-xl"
               >Add a course</button>
             </div>
@@ -436,12 +436,13 @@ function App() {
 
       {/* add course modal */}
       <AddCourseModal 
-        isOpen={isModalOpen} 
-        onClose={() => {setIsModalOpen(false)}} 
+        isOpen={isCourseModalOpen} 
+        onClose={() => {setIsCourseModalOpen(false)}} 
         onSubmit={async() => {await handleCourseAdded()}}
         schools={universityOptions} 
-        majors={majorOptions}/>
-        
+        majors={majorOptions}
+      />
+    
       </main>
 
       <Footer />
