@@ -10,6 +10,7 @@ import Select, { type SingleValue } from "react-select"
 import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
 import { Pagination } from "react-bootstrap"
 import './lib/customPagination.css'
+import AddCourseModal from './components/AddCourseModal' 
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
@@ -32,6 +33,7 @@ function App() {
   const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null)
   const [totalPages, setTotalPages] = useState(1)
   const [curPage, setCurPage] = useState(1)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     loadSubjects()
@@ -45,17 +47,9 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const nameFiltered = getFilteredSubjectsByName()
-    const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
-    const universityFiltered = getFilteredSubjectsByUniversity(majorFiltered)
-    const filterByTag = async () => {
-      const final = await getFilteredSubjectsByTags(universityFiltered)
-      setFilteredSubjects(final)
-      setTotalPages(Math.ceil(final.length/itemsPerPage))
-    }
-    
-    filterByTag()
-  }, [courseQuery, selectedMajor, selectedUniversity, tagQuery])
+    filterSubjects()
+    setCurPage(1)
+  }, [subjects, courseQuery, selectedMajor, selectedUniversity, tagQuery])
 
   const loadSubjects = async () => {
     try {
@@ -86,6 +80,19 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterSubjects = () => {
+    const nameFiltered = getFilteredSubjectsByName()
+    const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
+    const universityFiltered = getFilteredSubjectsByUniversity(majorFiltered)
+    const filterByTag = async () => {
+      const final = await getFilteredSubjectsByTags(universityFiltered)
+      setFilteredSubjects(final)
+      setTotalPages(Math.ceil(final.length/itemsPerPage))
+    }
+    
+    filterByTag()
   }
 
   // returns list of subjects containing searched name
@@ -139,6 +146,11 @@ function App() {
 
   const handleVoteSubmitted = () => {
     setLeaderboardKey(prev => prev + 1)
+  }
+
+  const handleCourseAdded = async() => {
+    await loadSubjects();
+    filterSubjects()
   }
 
   const Header = () => (
@@ -305,11 +317,14 @@ function App() {
         {/* search bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-red-500/30 shadow-2xl">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
-            </div>
+            {/* filters */}
+            <div className='mb-8'>
+              <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
+              </div>
 
-            <div className="flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* name search */}
                 <div>
                   <p className="mb-2">By name:</p>
                   <input
@@ -321,6 +336,7 @@ function App() {
                   />
                 </div>
 
+                {/* uni search */}
                 <div>
                   <p className="mb-2">By university:</p>
                   <Select<OptionType, false>
@@ -336,9 +352,11 @@ function App() {
                     placeholder="Select a university"
                     styles={customSingleSelectStyle}
                     className="react-select"
+                    isClearable
                   />
                 </div>
 
+                {/* major search */}
                 <div>
                   <p className="mb-2">By major:</p>
                   <Select<OptionType, false>
@@ -348,9 +366,11 @@ function App() {
                     placeholder="Select a major"
                     styles={customSingleSelectStyle}
                     className="react-select"
+                    isClearable
                   />
                 </div>
 
+                {/* tag search */}
                 <div>
                   <p className="mb-2">Contains tags:</p>
                   <Select
@@ -363,6 +383,16 @@ function App() {
                     className='react-select'
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* add a course */}
+            <div className='flex items-center'>
+              <p className='mb-2 mr-4 inline-block'>Don't see your course?</p>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-3 py-2 bg-red-700 rounded-xl"
+              >Add a course</button>
             </div>
           </div>
         </div>
@@ -404,6 +434,14 @@ function App() {
           </div>
         </div>
 
+      {/* add course modal */}
+      <AddCourseModal 
+        isOpen={isModalOpen} 
+        onClose={() => {setIsModalOpen(false)}} 
+        onSubmit={async() => {await handleCourseAdded()}}
+        schools={universityOptions} 
+        majors={majorOptions}/>
+        
       </main>
 
       <Footer />
