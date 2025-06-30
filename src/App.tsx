@@ -394,16 +394,18 @@ function App() {
           )}
         </div>
 
-        <div className='flex justify-center rounded-lg inline-block'>
-          <Pagination className='my-pagination'> 
-            <Pagination.Prev disabled={curPage==1} onClick={() => setCurPage(curPage-1)}>Previous</Pagination.Prev>
-            {
-              Array.from({length: totalPages}, (_, i) => i + 1).map(pgNumber => 
-                <Pagination.Item key={pgNumber} active={curPage==pgNumber} onClick={() => setCurPage(pgNumber)}>{pgNumber}</Pagination.Item>
-              )
-            }
-            <Pagination.Next disabled={curPage==totalPages} onClick={() => setCurPage(curPage+1)}>Next</Pagination.Next>
-          </Pagination>
+        <div className="flex justify-center">
+          <div className="rounded-lg overflow-hidden inline-block">
+            <Pagination className="my-pagination">
+              <Pagination.Prev className='pag-prev' disabled={curPage==1} onClick={() => setCurPage(curPage-1)}>Previous</Pagination.Prev>
+              {
+                Array.from({length: totalPages}, (_, i) => i + 1).map(pgNumber => 
+                  <Pagination.Item key={pgNumber} active={curPage==pgNumber} onClick={() => setCurPage(pgNumber)}>{pgNumber}</Pagination.Item>
+                )
+              }
+              <Pagination.Next className='pag-next' disabled={curPage==totalPages} onClick={() => setCurPage(curPage+1)}>Next</Pagination.Next>
+            </Pagination>
+          </div>
         </div>
 
       </main>
