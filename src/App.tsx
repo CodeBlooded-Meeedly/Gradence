@@ -309,53 +309,49 @@ function App() {
                 <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
             </div>
 
-            <div className="flex">
-                <div className="w-1/3">
+            <div className="flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
                   <p className="mb-2">By name:</p>
                   <input
                     type="text"
                     placeholder="Course name"
                     value={courseQuery}
                     onChange={(e) => setCourseQuery(e.target.value)}
-                    className="rounded-md px-4 py-2 w-5/6"
+                    className="rounded-md px-4 py-2 w-full"
                   />
                 </div>
 
-                <div className="w-1/3">
+                <div>
                   <p className="mb-2">By university:</p>
-                  <div className="w-5/6">
-                    <Select<OptionType, false>
-                      options={universityOptions.map(u => ({ label: u, value: u }))}
-                      value={
-                        selectedUniversity
-                          ? { label: selectedUniversity, value: selectedUniversity }
-                          : null
-                      }
-                      onChange={(v: SingleValue<OptionType>) =>
-                        setSelectedUniversity(v?.value || null)
-                      }
-                      placeholder="Select a university"
-                      styles={customSingleSelectStyle}
-                      className="react-select"
-                    />
-                  </div>
-              </div>
-
-                <div className="w-1/3">
-                  <p className="mb-2">By major:</p>
-                  <div className="w-5/6">
-                    <Select<OptionType, false>
-                      options={majorOptions.map(m => ({ label: m, value: m }))}
-                      value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
-                      onChange={(selected: SingleValue<OptionType>) => setSelectedMajor(selected?.value || null)}
-                      placeholder="Select a major"
-                      styles={customSingleSelectStyle}
-                      className="react-select"
-                    />
-                  </div>
+                  <Select<OptionType, false>
+                    options={universityOptions.map(u => ({ label: u, value: u }))}
+                    value={
+                      selectedUniversity
+                        ? { label: selectedUniversity, value: selectedUniversity }
+                        : null
+                    }
+                    onChange={(v: SingleValue<OptionType>) =>
+                      setSelectedUniversity(v?.value || null)
+                    }
+                    placeholder="Select a university"
+                    styles={customSingleSelectStyle}
+                    className="react-select"
+                  />
                 </div>
 
-                <div className="w-1/3">
+                <div>
+                  <p className="mb-2">By major:</p>
+                  <Select<OptionType, false>
+                    options={majorOptions.map(m => ({ label: m, value: m }))}
+                    value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
+                    onChange={(selected: SingleValue<OptionType>) => setSelectedMajor(selected?.value || null)}
+                    placeholder="Select a major"
+                    styles={customSingleSelectStyle}
+                    className="react-select"
+                  />
+                </div>
+
+                <div>
                   <p className="mb-2">Contains tags:</p>
                   <Select
                     isMulti
@@ -394,7 +390,7 @@ function App() {
           )}
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mx-4">
           <div className="rounded-lg overflow-hidden inline-block">
             <Pagination className="my-pagination">
               <Pagination.Prev className='pag-prev' disabled={curPage==1} onClick={() => setCurPage(curPage-1)}>Previous</Pagination.Prev>
