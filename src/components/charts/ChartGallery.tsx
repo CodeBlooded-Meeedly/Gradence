@@ -4,46 +4,49 @@ import type {
   TopSubject,
   MostVotedSubject,
   WeeklyTrendingSubject,
-  VoteTrend,
   HourlyActivity,
   MostImprovedSubject,
-  EmojiVoteDistribution
+  EmojiVoteDistribution,
+  TodaysTop3Subject,
+  Top3PositiveSubject,
+  Top3BoringSubject
 } from '../../lib/supabase'
 import {
   VoteTrendsChart,
-  HourlyActivityChart,
-  TopSubjectsChart,
-  VoteDistributionChart,
-  WeeklyTrendsChart,
-  ImprovementChart
+  Top3PositiveChart,
+  Top3BoringChart
 } from './index'
 
 interface ChartGalleryProps {
   topSubjects: TopSubject[]
   mostVoted: MostVotedSubject[]
   weeklyTrending: WeeklyTrendingSubject[]
-  voteTrends: VoteTrend[]
   hourlyActivity: HourlyActivity[]
   mostImproved: MostImprovedSubject[]
+  todaysTop3?: TodaysTop3Subject[]
+  top3Positive?: Top3PositiveSubject[]
+  top3Boring?: Top3BoringSubject[]
 }
 
 export const ChartGallery = ({
   topSubjects,
   mostVoted,
   weeklyTrending,
-  voteTrends,
   hourlyActivity,
-  mostImproved
+  mostImproved,
+  todaysTop3 = [],
+  top3Positive = [],
+  top3Boring = []
 }: ChartGalleryProps) => {
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
   const [emojiVoteDistribution, setEmojiVoteDistribution] = useState<EmojiVoteDistribution[]>([])
 
   useEffect(() => {
     loadEmojiVoteDistribution()
-    
-    // Set up real-time subscription for votes table to refresh emoji distribution
+    // Use a unique channel name per component instance
+    const channelName = `votes_changes_gallery_${Math.random().toString(36).substring(2, 10)}`
     const votesSubscription = supabase
-      .channel('votes_changes_gallery')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -53,7 +56,6 @@ export const ChartGallery = ({
         },
         (payload) => {
           console.log('New vote detected in gallery:', payload)
-          // Reload emoji vote distribution when a new vote is added
           loadEmojiVoteDistribution()
         }
       )
@@ -61,7 +63,7 @@ export const ChartGallery = ({
 
     // Cleanup subscription on unmount
     return () => {
-      votesSubscription.unsubscribe()
+      supabase.removeChannel(votesSubscription)
     }
   }, [])
 
@@ -78,61 +80,37 @@ export const ChartGallery = ({
 
   const charts = [
     {
-      id: 'vote-trends',
-      title: '📈 Vote Trends (7 Days)',
-      description: 'Line chart showing voting patterns over the last week',
-      component: voteTrends.length > 0 ? <VoteTrendsChart data={voteTrends} /> : null,
-      available: voteTrends.length > 0
+      id: 'top-3-positive',
+      title: '❤️ Top 3 Best Voted Subjects',
+      description: 'Horizontal bar chart of highest rated subjects by aggregate score',
+      component: top3Positive.length > 0 ? <Top3PositiveChart data={top3Positive} /> : null,
+      available: true
     },
     {
-      id: 'hourly-activity',
-      title: '⚡ Hourly Activity',
-      description: 'Bar chart showing today\'s voting activity by hour',
-      component: hourlyActivity.length > 0 ? <HourlyActivityChart data={hourlyActivity} /> : null,
-      available: hourlyActivity.length > 0
-    },
-    {
-      id: 'top-rated',
-      title: '🥇 Top Rated Subjects',
-      description: 'Horizontal bar chart of highest rated subjects',
-      component: <TopSubjectsChart data={topSubjects} title="" dataKey="average_vote" colorKey="vote" />,
-      available: topSubjects.length > 0
-    },
-    {
-      id: 'most-voted',
-      title: '🗳️ Most Voted Subjects',
-      description: 'Horizontal bar chart of subjects with most votes',
-      component: <TopSubjectsChart data={mostVoted} title="" dataKey="total_votes" colorKey="count" />,
-      available: mostVoted.length > 0
-    },
-    {
-      id: 'vote-distribution',
-      title: '📊 Vote Distribution',
-      description: 'Pie chart showing emoji vote percentages',
-      component: emojiVoteDistribution.length > 0 ? <VoteDistributionChart data={emojiVoteDistribution} /> : null,
-      available: emojiVoteDistribution.length > 0
+      id: 'top-3-boring',
+      title: '😴 3 Most Boring Subjects',
+      description: 'Horizontal bar chart of lowest rated subjects',
+      component: top3Boring.length > 0 ? <Top3BoringChart data={top3Boring} /> : null,
+      available: true
     },
     {
       id: 'weekly-trends',
-      title: '📈 Weekly Trending',
-      description: 'Combo chart showing weekly votes and ratings',
-      component: <WeeklyTrendsChart data={weeklyTrending} />,
-      available: weeklyTrending.length > 0
-    },
-    {
-      id: 'improvement',
-      title: '📈 Most Improved',
-      description: 'Horizontal bar chart showing subject improvements',
-      component: <ImprovementChart data={mostImproved} />,
-      available: mostImproved.length > 0
+      title: '📈 Weekly Voting Trends',
+      description: 'Line chart showing voting patterns for the last week',
+      component: weeklyTrending.length > 0 ? <VoteTrendsChart data={weeklyTrending} /> : null,
+      available: true
     }
   ]
 
-  const availableCharts = charts.filter(chart => chart.available)
+  // Show all charts, even if data is empty
+  const availableCharts = charts // no filter
 
   // Debug logging
   console.log('Chart availability:', {
-    voteTrends: voteTrends.length,
+    todaysTop3: todaysTop3.length,
+    top3Positive: top3Positive.length,
+    top3Boring: top3Boring.length,
+    voteTrends: weeklyTrending.length,
     hourlyActivity: hourlyActivity.length,
     topSubjects: topSubjects.length,
     mostVoted: mostVoted.length,
@@ -190,16 +168,18 @@ export const ChartGallery = ({
               </div>
             </div>
             <p className="text-gray-300 text-base mb-4">{chart.description}</p>
-            
             {/* Mini preview */}
             <div className="h-24 bg-gradient-to-br from-red-500/20 to-red-400/20 rounded-lg flex items-center justify-center">
-              <div className="text-4xl opacity-50">
-                {chart.title.includes('📈') && '📈'}
-                {chart.title.includes('⚡') && '⚡'}
-                {chart.title.includes('🥇') && '🥇'}
-                {chart.title.includes('🗳️') && '🗳️'}
-                {chart.title.includes('📊') && '📊'}
-              </div>
+              {chart.component ? (
+                <div className="text-4xl opacity-50">
+                  {chart.title.includes('🥇') && '🥇'}
+                  {chart.title.includes('❤️') && '❤️'}
+                  {chart.title.includes('😴') && '😴'}
+                  {chart.title.includes('📈') && '📈'}
+                </div>
+              ) : (
+                <span className="text-gray-400 text-sm">No data</span>
+              )}
             </div>
           </div>
         ))}

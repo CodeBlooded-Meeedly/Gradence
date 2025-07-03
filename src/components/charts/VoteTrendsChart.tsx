@@ -1,8 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import type { VoteTrend } from '../../lib/supabase'
 
 interface VoteTrendsChartProps {
-  data: VoteTrend[]
+  data: any[]
 }
 
 export const VoteTrendsChart = ({ data }: VoteTrendsChartProps) => {

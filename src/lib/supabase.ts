@@ -83,15 +83,6 @@ export interface WeeklyTrendingSubject {
   rank_position: number
 }
 
-export interface VoteTrend {
-  date_label: string
-  total_votes: number
-  skull_votes: number
-  sleepy_votes: number
-  heart_votes: number
-  fire_votes: number
-}
-
 export interface HourlyActivity {
   hour_label: string
   vote_count: number
@@ -119,4 +110,34 @@ export interface EmojiVoteDistribution {
   emoji_name: string
   vote_count: number
   vote_percentage: number
+}
+
+// New types for enhanced leaderboard
+export interface TodaysTop3Subject {
+  subject_id: string
+  subject_name: string
+  todays_votes: number
+  average_vote: number
+  rank_position: number
+}
+
+export interface Top3PositiveSubject {
+  subject_id: string
+  subject_name: string
+  total_votes: number
+  average_rating: number
+  rank_position: number
+}
+
+export interface Top3BoringSubject {
+  subject_id: string
+  subject_name: string
+  total_votes: number
+  total_rating_sum: number
+  rank_position: number
+}
+
+export interface VotesPastHour {
+  votes_past_hour: number
+  unique_voters_past_hour: number
 } 
