@@ -112,10 +112,16 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
       if (error) {
         console.error('Voting error details:', {
           error,
-          votePayload
+          userId,
+          subjectId: subject.id,
+          voteValue: selectedVote
         })
-        alert('Failed to submit vote: ' + error.message)
-        return
+        // Handle unique constraint violation gracefully
+        if (error.code === '23505') { // unique_violation
+          alert('You have already voted for this subject from this device or browser.')
+        } else {
+          throw error
+        }
       }
 
       // add tag votes to backend (insert into tag_votes, not votes)

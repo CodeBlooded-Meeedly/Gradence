@@ -8,11 +8,15 @@ import { ShareButton } from './components/ShareButton'
 import { SpinWheel } from './components/SpinWheel'
 import Select, { type SingleValue } from "react-select"
 import { customSelectStyles2, customSingleSelectStyle } from './lib/styleUtils'
+import { Pagination } from "react-bootstrap"
+import './lib/customPagination.css'
+import AddCourseModal from './components/AddCourseModal' 
 
 const VISITED_KEY = 'gradence-has-visited'
 const tags = ['good prof', 'bad prof', 'heavy workload', 'light workload', 'easy', 'hard']
 const tagOptions = tags.map(tag => ({ value: tag, label: tag }))
 type OptionType = { label: string; value: string };
+const itemsPerPage = 9
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([])
@@ -27,7 +31,9 @@ function App() {
   const [tagQuery, setTagQuery] = useState<string[]>([])
   const [universityOptions, setUniversityOptions] = useState<string[]>([])
   const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null)
-
+  const [totalPages, setTotalPages] = useState(1)
+  const [curPage, setCurPage] = useState(1)
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
 
   useEffect(() => {
     loadSubjects()
@@ -41,16 +47,9 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const nameFiltered = getFilteredSubjectsByName()
-    const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
-    const universityFiltered = getFilteredSubjectsByUniversity(majorFiltered)
-    const filterByTag = async () => {
-      const final = await getFilteredSubjectsByTags(universityFiltered)
-      setFilteredSubjects(final)
-    }
-    
-    filterByTag()
-  }, [courseQuery, selectedMajor, selectedUniversity, tagQuery])
+    filterSubjects()
+    setCurPage(1)
+  }, [subjects, courseQuery, selectedMajor, selectedUniversity, tagQuery])
 
   const loadSubjects = async () => {
     try {
@@ -63,6 +62,7 @@ function App() {
       if (error) throw error
       setSubjects(data || [])
       setFilteredSubjects(data || [])
+      setTotalPages(Math.ceil(data.length/itemsPerPage))
 
       const uniqueMajors = Array.from( // extract unique majors from subjects
         new Set((data || []).map(subject => subject.major).filter(Boolean))
@@ -80,6 +80,19 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterSubjects = () => {
+    const nameFiltered = getFilteredSubjectsByName()
+    const majorFiltered = getFilteredSubjectsByMajor(nameFiltered)
+    const universityFiltered = getFilteredSubjectsByUniversity(majorFiltered)
+    const filterByTag = async () => {
+      const final = await getFilteredSubjectsByTags(universityFiltered)
+      setFilteredSubjects(final)
+      setTotalPages(Math.ceil(final.length/itemsPerPage))
+    }
+    
+    filterByTag()
   }
 
   // returns list of subjects containing searched name
@@ -133,6 +146,11 @@ function App() {
 
   const handleVoteSubmitted = () => {
     setLeaderboardKey(prev => prev + 1)
+  }
+
+  const handleCourseAdded = async() => {
+    await loadSubjects();
+    filterSubjects()
   }
 
   const Header = () => (
@@ -299,57 +317,61 @@ function App() {
         {/* search bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-red-500/30 shadow-2xl">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
-            </div>
+            {/* filters */}
+            <div className='mb-8'>
+              <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-2xl font-bold text-gradient mb-2">Search</h3>
+              </div>
 
-            <div className="flex">
-                <div className="w-1/3">
+              <div className="flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* name search */}
+                <div>
                   <p className="mb-2">By name:</p>
                   <input
                     type="text"
                     placeholder="Course name"
                     value={courseQuery}
                     onChange={(e) => setCourseQuery(e.target.value)}
-                    className="rounded-md px-4 py-2 w-5/6"
+                    className="rounded-md px-4 py-2 w-full bg-[#3b3b3b]"
                   />
                 </div>
 
-                <div className="w-1/3">
+                {/* uni search */}
+                <div>
                   <p className="mb-2">By university:</p>
-                  <div className="w-5/6">
-                    <Select<OptionType, false>
-                      options={universityOptions.map(u => ({ label: u, value: u }))}
-                      value={
-                        selectedUniversity
-                          ? { label: selectedUniversity, value: selectedUniversity }
-                          : null
-                      }
-                      onChange={(v: SingleValue<OptionType>) =>
-                        setSelectedUniversity(v?.value || null)
-                      }
-                      placeholder="Select a university"
-                      styles={customSingleSelectStyle}
-                      className="react-select"
-                    />
-                  </div>
-              </div>
-
-                <div className="w-1/3">
-                  <p className="mb-2">By major:</p>
-                  <div className="w-5/6">
-                    <Select<OptionType, false>
-                      options={majorOptions.map(m => ({ label: m, value: m }))}
-                      value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
-                      onChange={(selected: SingleValue<OptionType>) => setSelectedMajor(selected?.value || null)}
-                      placeholder="Select a major"
-                      styles={customSingleSelectStyle}
-                      className="react-select"
-                    />
-                  </div>
+                  <Select<OptionType, false>
+                    options={universityOptions.map(u => ({ label: u, value: u }))}
+                    value={
+                      selectedUniversity
+                        ? { label: selectedUniversity, value: selectedUniversity }
+                        : null
+                    }
+                    onChange={(v: SingleValue<OptionType>) =>
+                      setSelectedUniversity(v?.value || null)
+                    }
+                    placeholder="Select a university"
+                    styles={customSingleSelectStyle}
+                    className="react-select"
+                    isClearable
+                  />
                 </div>
 
-                <div className="w-1/3">
+                {/* major search */}
+                <div>
+                  <p className="mb-2">By major:</p>
+                  <Select<OptionType, false>
+                    options={majorOptions.map(m => ({ label: m, value: m }))}
+                    value={selectedMajor ? { label: selectedMajor, value: selectedMajor } : null}
+                    onChange={(selected: SingleValue<OptionType>) => setSelectedMajor(selected?.value || null)}
+                    placeholder="Select a major"
+                    styles={customSingleSelectStyle}
+                    className="react-select"
+                    isClearable
+                  />
+                </div>
+
+                {/* tag search */}
+                <div>
                   <p className="mb-2">Contains tags:</p>
                   <Select
                     isMulti
@@ -361,6 +383,16 @@ function App() {
                     className='react-select'
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* add a course */}
+            <div className='flex items-center'>
+              <p className='mb-2 mr-4 inline-block'>Don't see your course?</p>
+              <button
+                onClick={() => setIsCourseModalOpen(true)}
+                className="px-3 py-2 bg-red-700 rounded-xl"
+              >Add a course</button>
             </div>
           </div>
         </div>
@@ -376,7 +408,7 @@ function App() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredSubjects.map((subject) => (
+              {filteredSubjects.slice((curPage-1)*itemsPerPage, curPage*itemsPerPage).map((subject) => (
                 <SubjectCard 
                   key={subject.id} 
                   subject={subject} 
@@ -387,6 +419,30 @@ function App() {
             </div>
           )}
         </div>
+
+        <div className="flex justify-center mx-4">
+          <div className="rounded-lg overflow-hidden inline-block">
+            <Pagination className="my-pagination">
+              <Pagination.Prev className='pag-prev' disabled={curPage==1} onClick={() => setCurPage(curPage-1)}>Previous</Pagination.Prev>
+              {
+                Array.from({length: totalPages}, (_, i) => i + 1).map(pgNumber => 
+                  <Pagination.Item key={pgNumber} active={curPage==pgNumber} onClick={() => setCurPage(pgNumber)}>{pgNumber}</Pagination.Item>
+                )
+              }
+              <Pagination.Next className='pag-next' disabled={curPage==totalPages} onClick={() => setCurPage(curPage+1)}>Next</Pagination.Next>
+            </Pagination>
+          </div>
+        </div>
+
+      {/* add course modal */}
+      <AddCourseModal 
+        isOpen={isCourseModalOpen} 
+        onClose={() => {setIsCourseModalOpen(false)}} 
+        onSubmit={async() => {await handleCourseAdded()}}
+        schools={universityOptions} 
+        majors={majorOptions}
+      />
+    
       </main>
 
       <Footer />
