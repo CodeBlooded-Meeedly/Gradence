@@ -1,30 +1,91 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import type { 
-  TopSubject, 
-  MostVotedSubject, 
-  WeeklyTrendingSubject,
-  VoteTrend,
-  HourlyActivity,
-  MostImprovedSubject,
-  OverallStats
+import type {
+  OverallStats,
+  Top3PositiveSubject,
+  Top3BoringSubject,
 } from '../lib/supabase'
-import { ChartGallery } from './charts'
+
+const boringEmojis = ['🥵', '😴', '🥱']
+
+function Top3Triangle({ data }: { data: Top3PositiveSubject[] }) {
+  const [first, second, third] = [data[0], data[1], data[2]]
+  return (
+    <div className="flex flex-col items-center w-full">
+      {/* Top row: 1st place */}
+      <div className="flex justify-center mb-4">
+        {first && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-56">
+            <span className="text-5xl mb-2">🥇</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{first.subject_name}</span>
+            <span className="text-sm text-blue-200">{first.average_rating.toFixed(2)} avg rating</span>
+          </div>
+        )}
+      </div>
+      {/* Bottom row: 2nd and 3rd place */}
+      <div className="flex flex-row justify-center gap-8">
+        {second && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-48">
+            <span className="text-5xl mb-2">🥈</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{second.subject_name}</span>
+            <span className="text-sm text-blue-200">{second.average_rating.toFixed(2)} avg rating</span>
+          </div>
+        )}
+        {third && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-48">
+            <span className="text-5xl mb-2">🥉</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{third.subject_name}</span>
+            <span className="text-sm text-blue-200">{third.average_rating.toFixed(2)} avg rating</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Bottom3Triangle({ data }: { data: Top3BoringSubject[] }) {
+  const [first, second, third] = [data[0], data[1], data[2]]
+  return (
+    <div className="flex flex-col items-center w-full">
+      {/* Top row: 1st place (most boring) */}
+      <div className="flex justify-center mb-4">
+        {first && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-purple-500/30 shadow p-6 w-56">
+            <span className="text-5xl mb-2">{boringEmojis[0]}</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{first.subject_name}</span>
+            <span className="text-sm text-purple-200">{first.total_rating_sum.toFixed(0)} total score</span>
+          </div>
+        )}
+      </div>
+      {/* Bottom row: 2nd and 3rd place */}
+      <div className="flex flex-row justify-center gap-8">
+        {second && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-purple-500/30 shadow p-6 w-48">
+            <span className="text-5xl mb-2">{boringEmojis[1]}</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{second.subject_name}</span>
+            <span className="text-sm text-purple-200">{second.total_rating_sum.toFixed(0)} total score</span>
+          </div>
+        )}
+        {third && (
+          <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-purple-500/30 shadow p-6 w-48">
+            <span className="text-5xl mb-2">{boringEmojis[2]}</span>
+            <span className="font-bold text-lg text-white text-center mb-1">{third.subject_name}</span>
+            <span className="text-sm text-purple-200">{third.total_rating_sum.toFixed(0)} total score</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export const Leaderboard = () => {
   const [loading, setLoading] = useState(true)
   const [overallStats, setOverallStats] = useState<OverallStats | null>(null)
-  const [topSubjects, setTopSubjects] = useState<TopSubject[]>([])
-  const [mostVoted, setMostVoted] = useState<MostVotedSubject[]>([])
-  const [weeklyTrending, setWeeklyTrending] = useState<WeeklyTrendingSubject[]>([])
-  const [voteTrends, setVoteTrends] = useState<VoteTrend[]>([])
-  const [hourlyActivity, setHourlyActivity] = useState<HourlyActivity[]>([])
-  const [mostImproved, setMostImproved] = useState<MostImprovedSubject[]>([])
+  const [top3Positive, setTop3Positive] = useState<Top3PositiveSubject[]>([])
+  const [top3Boring, setTop3Boring] = useState<Top3BoringSubject[]>([])
 
   useEffect(() => {
     loadLeaderboardData()
-    
-    // Set up real-time subscription for votes table
     const votesSubscription = supabase
       .channel('votes_changes')
       .on(
@@ -34,15 +95,9 @@ export const Leaderboard = () => {
           schema: 'public',
           table: 'votes'
         },
-        (payload) => {
-          console.log('New vote detected:', payload)
-          // Reload data when a new vote is added
-          loadLeaderboardData()
-        }
+        () => loadLeaderboardData()
       )
       .subscribe()
-
-    // Cleanup subscription on unmount
     return () => {
       votesSubscription.unsubscribe()
     }
@@ -51,47 +106,18 @@ export const Leaderboard = () => {
   const loadLeaderboardData = async () => {
     try {
       setLoading(true)
-      
       const [
-        statsResult,
-        topResult,
-        mostVotedResult,
-        todaysResult,
-        weeklyResult,
-        trendsResult,
-        hourlyResult,
-        improvedResult
+        overallStatsResult,
+        top3PositiveResult,
+        top3BoringResult
       ] = await Promise.all([
         supabase.rpc('get_overall_stats'),
-        supabase.rpc('get_top_subjects_all_time', { limit_count: 10 }),
-        supabase.rpc('get_most_voted_subjects', { limit_count: 10 }),
-        supabase.rpc('get_todays_top_subjects', { limit_count: 5 }),
-        supabase.rpc('get_weekly_trending_subjects', { limit_count: 5 }),
-        supabase.rpc('get_vote_trends_7_days'),
-        supabase.rpc('get_todays_hourly_activity'),
-        supabase.rpc('get_most_improved_subjects', { limit_count: 5 })
+        supabase.rpc('get_top_3_positive_subjects'),
+        supabase.rpc('get_top_3_boring_subjects')
       ])
-
-      // Debug logging with errors
-      console.log('Leaderboard data loaded:', {
-        stats: { data: statsResult.data?.length, error: statsResult.error },
-        top: { data: topResult.data?.length, error: topResult.error },
-        mostVoted: { data: mostVotedResult.data?.length, error: mostVotedResult.error },
-        todays: { data: todaysResult.data?.length, error: todaysResult.error },
-        weekly: { data: weeklyResult.data?.length, error: weeklyResult.error },
-        trends: { data: trendsResult.data?.length, error: trendsResult.error },
-        hourly: { data: hourlyResult.data?.length, error: hourlyResult.error },
-        improved: { data: improvedResult.data?.length, error: improvedResult.error }
-      })
-
-      if (statsResult.data) setOverallStats(statsResult.data[0])
-      if (topResult.data) setTopSubjects(topResult.data)
-      if (mostVotedResult.data) setMostVoted(mostVotedResult.data)
-      if (weeklyResult.data) setWeeklyTrending(weeklyResult.data)
-      if (trendsResult.data) setVoteTrends(trendsResult.data)
-      if (hourlyResult.data) setHourlyActivity(hourlyResult.data)
-      if (improvedResult.data) setMostImproved(improvedResult.data)
-
+      if (overallStatsResult.data) setOverallStats(overallStatsResult.data[0])
+      if (top3PositiveResult.data) setTop3Positive(top3PositiveResult.data)
+      if (top3BoringResult.data) setTop3Boring(top3BoringResult.data)
     } catch (error) {
       console.error('Error loading leaderboard data:', error)
     } finally {
@@ -122,7 +148,6 @@ export const Leaderboard = () => {
           <span className="text-base text-gray-400">Live</span>
         </div>
       </div>
-
       {overallStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-black/60 rounded-xl p-4 text-center border border-red-500/30">
@@ -143,15 +168,19 @@ export const Leaderboard = () => {
           </div>
         </div>
       )}
-
-      <ChartGallery
-        topSubjects={topSubjects}
-        mostVoted={mostVoted}
-        weeklyTrending={weeklyTrending}
-        voteTrends={voteTrends}
-        hourlyActivity={hourlyActivity}
-        mostImproved={mostImproved}
-      />
+      {/* Top 3 Best Voted Subjects and 3 Most Boring Subjects side by side */}
+      <div className="mb-12 flex flex-col md:flex-row md:justify-between md:items-start gap-8 w-full">
+        {/* Left: Top 3 Best Voted Subjects */}
+        <div className="flex-1 flex flex-col items-center bg-black/60 rounded-2xl border-2 border-blue-400/40 shadow-lg p-4">
+          <h3 className="text-xl font-bold text-blue-300 mb-6 flex items-center">💙 Top 3 Best Voted Subjects</h3>
+          <Top3Triangle data={top3Positive} />
+        </div>
+        {/* Right: 3 Most Boring Subjects */}
+        <div className="flex-1 flex flex-col items-center bg-black/60 rounded-2xl border-2 border-purple-400/40 shadow-lg p-4">
+          <h3 className="text-xl font-bold text-purple-300 mb-6 flex items-center">😴 3 Most Boring Subjects</h3>
+          <Bottom3Triangle data={top3Boring} />
+        </div>
+      </div>
     </div>
   )
 } 

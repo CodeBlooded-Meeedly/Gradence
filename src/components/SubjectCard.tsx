@@ -97,42 +97,36 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
         user_id: userId,
         subject_id: subject.id,
         vote_value: selectedVote,
+        vote_weight: voteWeight,
         feedback: feedback.trim() || null,
-        fingerprint_id: fingerprintId,
-        vote_weight: voteWeight
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        fingerprint_id: fingerprintId
       }
 
       const { data, error } = await supabase
         .from('votes')
-        .insert(votePayload)
+        .upsert([votePayload], { onConflict: 'user_id,subject_id' })
         .select()
 
       if (error) {
         console.error('Voting error details:', {
           error,
-          userId,
-          subjectId: subject.id,
-          voteValue: selectedVote
+          votePayload
         })
-        // Handle unique constraint violation gracefully
-        if (error.code === '23505') { // unique_violation
-          alert('You have already voted for this subject from this device or browser.')
-        } else {
-          throw error
-        }
+        alert('Failed to submit vote: ' + error.message)
+        return
       }
 
-      // add tag votes to backend
+      // add tag votes to backend (insert into tag_votes, not votes)
       if (selectedTags.length > 0) {
         const tagInsertData = selectedTags.map(tag => ({
           subject_id: subject.id,
           tag
         }))
-        
         const { error: tagError } = await supabase
           .from('tag_votes')
           .insert(tagInsertData)
-
         if (tagError) {
           console.error('Tag vote insert error:', JSON.stringify(tagError, null, 2));
         }
@@ -236,7 +230,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
         {topTags.length != 0 && (
           <div className="flex">
             {topTags.map(tag => {
-              return <p className="inline-block bg-[#b06dcd]/50 px-2 py-1 rounded mb-6 mr-2 text-sm">{tag}</p>
+              return <p key={tag} className="inline-block bg-[#b06dcd]/50 px-2 py-1 rounded mb-6 mr-2 text-sm">{tag}</p>
             })}
           </div>
         )}
