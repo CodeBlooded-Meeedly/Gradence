@@ -51,7 +51,7 @@ RETURNS TABLE (
   subject_id UUID,
   subject_name TEXT,
   total_votes BIGINT,
-  average_rating NUMERIC,
+  total_rating_sum NUMERIC,
   rank_position INTEGER
 ) AS $$
 BEGIN
@@ -60,25 +60,15 @@ BEGIN
     s.id,
     s.name,
     COALESCE(SUM(v.vote_weight), 0) AS total_votes,
-    CASE 
-      WHEN COALESCE(SUM(v.vote_weight), 0) > 0 
-        THEN ROUND(SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight), 2)
-      ELSE 0
-    END AS average_rating,
+    COALESCE(SUM(v.vote_value * v.vote_weight)::numeric, 0) AS total_rating_sum,
     ROW_NUMBER() OVER (
-      ORDER BY 
-        CASE 
-          WHEN COALESCE(SUM(v.vote_weight), 0) > 0 
-            THEN SUM(v.vote_value * v.vote_weight)::numeric / SUM(v.vote_weight)
-          ELSE 0
-        END DESC,
-        COALESCE(SUM(v.vote_weight), 0) DESC
+      ORDER BY COALESCE(SUM(v.vote_value * v.vote_weight), 0) DESC, COALESCE(SUM(v.vote_weight), 0) DESC
     )::INTEGER AS rank_position
   FROM subjects s
   LEFT JOIN votes v ON s.id = v.subject_id
   GROUP BY s.id, s.name
   HAVING COALESCE(SUM(v.vote_weight), 0) > 0
-  ORDER BY average_rating DESC, total_votes DESC
+  ORDER BY total_rating_sum DESC, total_votes DESC
   LIMIT 3;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
