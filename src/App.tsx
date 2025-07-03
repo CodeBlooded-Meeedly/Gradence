@@ -332,7 +332,7 @@ function App() {
                     placeholder="Course name"
                     value={courseQuery}
                     onChange={(e) => setCourseQuery(e.target.value)}
-                    className="rounded-md px-4 py-2 w-full"
+                    className="rounded-md px-4 py-2 w-full bg-[#3b3b3b]"
                   />
                 </div>
 

@@ -115,7 +115,7 @@ export const SubjectCard = ({ subject, tags, onVoteSubmitted }: SubjectCardProps
           voteValue: selectedVote
         })
         // Handle unique constraint violation gracefully
-        if (error.code === '23505') { // unique_violation
+        if (error?.code === '23505') { // unique_violation
           alert('You have already voted for this subject from this device or browser.')
         } else {
           throw error

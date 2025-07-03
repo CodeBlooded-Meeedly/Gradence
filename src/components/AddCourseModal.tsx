@@ -120,7 +120,7 @@ export default function AddCourseModal({isOpen, onClose, onSubmit, schools, majo
                     type="text"
                     placeholder='Course name'
                     onChange={(e) => setCourseName(e.target.value)}
-                    className="rounded-md px-4 py-2 w-full mb-6"
+                    className="rounded-md px-4 py-2 w-full mb-6 bg-[#3b3b3b]"
                 />
 
                 <h3 className='mb-2'>School*</h3>
