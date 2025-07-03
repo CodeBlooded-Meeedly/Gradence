@@ -18,7 +18,7 @@ function Top3Triangle({ data }: { data: Top3PositiveSubject[] }) {
           <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-56">
             <span className="text-5xl mb-2">🥇</span>
             <span className="font-bold text-lg text-white text-center mb-1">{first.subject_name}</span>
-            <span className="text-sm text-blue-200">{first.average_rating.toFixed(2)} avg rating</span>
+            <span className="text-sm text-blue-200">{first.total_rating_sum.toFixed(0)} total score</span>
           </div>
         )}
       </div>
@@ -28,14 +28,14 @@ function Top3Triangle({ data }: { data: Top3PositiveSubject[] }) {
           <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-48">
             <span className="text-5xl mb-2">🥈</span>
             <span className="font-bold text-lg text-white text-center mb-1">{second.subject_name}</span>
-            <span className="text-sm text-blue-200">{second.average_rating.toFixed(2)} avg rating</span>
+            <span className="text-sm text-blue-200">{second.total_rating_sum.toFixed(0)} total score</span>
           </div>
         )}
         {third && (
           <div className="flex flex-col items-center bg-black/60 rounded-2xl border border-blue-500/30 shadow p-6 w-48">
             <span className="text-5xl mb-2">🥉</span>
             <span className="font-bold text-lg text-white text-center mb-1">{third.subject_name}</span>
-            <span className="text-sm text-blue-200">{third.average_rating.toFixed(2)} avg rating</span>
+            <span className="text-sm text-blue-200">{third.total_rating_sum.toFixed(0)} total score</span>
           </div>
         )}
       </div>

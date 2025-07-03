@@ -12,7 +12,7 @@ const medalEmojis = ['🥇', '🥈', '🥉']
 export const Top3PositiveChart = ({ data, showMedals = false, showVoteAggregates = false }: Top3PositiveChartProps) => {
   const chartData = data.map((item, idx) => ({
     name: showMedals ? `${medalEmojis[idx] || ''} ${item.subject_name}` : item.subject_name,
-    averageVote: item.average_rating,
+    totalRatingSum: item.total_rating_sum,
     totalVotes: item.total_votes,
     rank: item.rank_position
   }))
@@ -49,12 +49,12 @@ export const Top3PositiveChart = ({ data, showMedals = false, showVoteAggregates
               color: '#f9fafb'
             }}
             formatter={(value: any, _name: string, props: any) => [
-              `Average Rating : ${value} rating`,
-              showVoteAggregates ? `${props.payload.totalVotes} votes` : 'Average Rating'
+              `Total Rating: ${value} rating`,
+              showVoteAggregates ? `${props.payload.totalVotes} votes` : 'Total Rating'
             ]}
             labelFormatter={(label) => label}
           />
-          <Bar dataKey="averageVote" radius={[0, 4, 4, 0]}>
+          <Bar dataKey="totalRatingSum" radius={[0, 4, 4, 0]}>
             {chartData.map((_entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index] || '#6b7280'} />
             ))}

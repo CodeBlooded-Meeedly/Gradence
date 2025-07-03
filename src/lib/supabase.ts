@@ -125,7 +125,7 @@ export interface Top3PositiveSubject {
   subject_id: string
   subject_name: string
   total_votes: number
-  average_rating: number
+  total_rating_sum: number
   rank_position: number
 }
 
