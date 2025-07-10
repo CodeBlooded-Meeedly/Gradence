@@ -171,12 +171,12 @@ export const ChartGallery = ({
             {/* Mini preview */}
             <div className="h-24 bg-gradient-to-br from-red-500/20 to-red-400/20 rounded-lg flex items-center justify-center">
               {chart.component ? (
-                <div className="text-4xl opacity-50">
+              <div className="text-4xl opacity-50">
                   {chart.title.includes('🥇') && '🥇'}
                   {chart.title.includes('❤️') && '❤️'}
                   {chart.title.includes('😴') && '😴'}
-                  {chart.title.includes('📈') && '📈'}
-                </div>
+                {chart.title.includes('📈') && '📈'}
+              </div>
               ) : (
                 <span className="text-gray-400 text-sm">No data</span>
               )}
