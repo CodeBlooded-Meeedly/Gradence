@@ -4,7 +4,7 @@ A modern, real-time anonymous subject voting and leaderboard web application for
 
 ## 🎯 Features
 
-- **Anonymous Voting**: Vote on university subjects with emoji-based feedback (👍👎)
+- **Anonymous Voting**: Vote on university subjects with emoji-based feedback 
 - **Real-time Leaderboard**: Live updates showing top-voted subjects with infinite carousel
 - **Interactive Charts**: Comprehensive analytics including:
   - Vote distribution charts
