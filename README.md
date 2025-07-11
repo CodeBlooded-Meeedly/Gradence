@@ -23,12 +23,10 @@ A modern, real-time anonymous subject voting and leaderboard web application for
 - **Styling**: Tailwind CSS, PostCSS
 - **Backend**: Supabase (PostgreSQL, Real-time subscriptions)
 - **Charts**: Recharts
-- **Deployment**: Vercel
+- **Deployment**: Netlify
 - **Package Manager**: npm
 
-## 📸 Screenshots
 
-> _Add screenshots here to showcase the UI_
 
 ## 🛠️ Getting Started
 
@@ -71,23 +69,22 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## 🚀 Deployment
 
-### Deploy to Vercel (Recommended)
+### Deploy to Netlify
 1. **Push your code to GitHub**
-2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
-3. Click **New Project** and import your repository
-4. Configure the project:
-   - **Root Directory**: `./` (root of the repo)
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
+2. Go to [netlify.com](https://netlify.com) and sign in with GitHub
+3. Click **New site from Git** and import your repository
+4. Configure the build settings:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
 5. Add environment variables:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-6. Click **Deploy**
+6. Click **Deploy site**
 
-Vercel will automatically deploy on every push to your main branch.
+Netlify will automatically deploy on every push to your main branch.
 
 ### Custom Domain
-Add a custom domain in your Vercel project settings if desired.
+Add a custom domain in your Netlify site settings if desired.
 
 ## 📁 Project Structure
 ```
