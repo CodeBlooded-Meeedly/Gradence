@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Autoplay } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/autoplay'
 import nayshaHeadshot from '../assets/nayshaheadshot.png'
 import hetaviHeadshot from '../assets/hetaviheadshot.jpg'
 import bryanHeadshot from '../assets/bryanheadshot.jpg'
@@ -66,130 +69,69 @@ const teamMembers: TeamMember[] = [
   }
 ]
 
-function getCardsPerView() {
-  if (typeof window !== 'undefined') {
-    if (window.innerWidth < 640) return 1 // mobile
-    if (window.innerWidth < 1024) return 2 // tablet
-    return 3 // desktop
-  }
-  return 3
-}
-
 export const TeamCarousel = () => {
-  const [isPaused, setIsPaused] = useState(false)
-  const [cardsPerView, setCardsPerView] = useState(getCardsPerView())
-  const [cardWidth, setCardWidth] = useState(0)
-  const [translateX, setTranslateX] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number | null>(null)
-
-  // Responsive cards per view
-  useEffect(() => {
-    const handleResize = () => setCardsPerView(getCardsPerView())
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Measure container width and set card width
-  useEffect(() => {
-    if (containerRef.current) {
-      const width = containerRef.current.offsetWidth
-      setCardWidth(width / cardsPerView)
-    }
-  }, [cardsPerView])
-
-  // Continuous animation
-  useEffect(() => {
-    if (isPaused) {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current)
-      return
-    }
-    let lastTimestamp = performance.now()
-    const speed = 60 // px per second
-    const animate = (timestamp: number) => {
-      const elapsed = timestamp - lastTimestamp
-      lastTimestamp = timestamp
-      setTranslateX(prev => {
-        let next = prev - (speed * elapsed) / 1000
-        // Reset for infinite loop
-        const totalWidth = cardWidth * teamMembers.length
-        if (Math.abs(next) >= totalWidth) {
-          next += totalWidth
-        }
-        return next
-      })
-      animationRef.current = requestAnimationFrame(animate)
-    }
-    animationRef.current = requestAnimationFrame(animate)
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current)
-    }
-  }, [isPaused, cardWidth, cardsPerView])
-
   const handleCardClick = (linkedinUrl: string) => {
     window.open(linkedinUrl, '_blank', 'noopener,noreferrer')
   }
 
-  // Duplicate cards for seamless loop
-  const displayMembers = [...teamMembers, ...teamMembers]
-
   return (
-    <div className="bg-black/80 rounded-2xl p-6 border border-red-500/30 shadow-2xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-black/80 rounded-2xl p-4 sm:p-6 border border-red-500/30 shadow-2xl">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gradient mb-2">👥 Our Team</h2>
-          <p className="text-base text-gray-300">Meet the developers behind Gradence</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gradient mb-1 sm:mb-2">👥 Our Team</h2>
+          <p className="text-sm sm:text-base text-gray-300">Meet the developers behind Gradence</p>
         </div>
       </div>
-
-      <div 
-        className="relative overflow-hidden flex items-center justify-center w-full"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        style={{ minHeight: '350px' }}
-        ref={containerRef}
+      <Swiper
+        modules={[Autoplay]}
+        loop={true}
+        freeMode={true}
+        autoplay={{
+          delay: 0,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        speed={4000}
+        slidesPerView={1}
+        allowTouchMove={false}
+        breakpoints={{
+          640: { slidesPerView: 1 },
+          768: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 },
+        }}
+        className="w-full"
+        initialSlide={0}
       >
-        <div
-          className={`flex`}
-          style={{
-            width: displayMembers.length * cardWidth,
-            transform: `translateX(${translateX}px)`,
-            transition: isPaused ? 'none' : 'transform 0.03s linear',
-          }}
-        >
-          {displayMembers.map((member, idx) => (
-            <div 
-              key={member.id + '-' + idx}
-              className="team-card flex items-center justify-center px-4"
-              style={{ width: cardWidth }}
-            >
-              <div 
-                className="bg-black/60 rounded-xl p-8 border border-red-500/30 hover:border-red-400/50 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/20 w-full max-w-md mx-auto"
+        {teamMembers.map((member) => (
+          <SwiperSlide key={member.id}>
+            <div className="team-card flex items-center justify-center px-2 sm:px-4 h-full">
+              <div
+                className="bg-black/60 rounded-xl p-4 sm:p-6 lg:p-8 border border-red-500/30 hover:border-red-400/50 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/20 w-full max-w-sm mx-auto"
                 onClick={() => handleCardClick(member.linkedin)}
               >
                 <div className="flex flex-col items-center">
                   <div className="relative mb-3">
-                    <img 
-                      src={member.headshot} 
-                      alt={`${member.name}'s Headshot`} 
-                      className="h-36 w-36 rounded-xl object-cover border-2 border-red-500/30"
+                    <img
+                      src={member.headshot}
+                      alt={`${member.name}'s Headshot`}
+                      className="h-24 w-24 sm:h-32 sm:w-32 lg:h-36 lg:w-36 rounded-xl object-cover border-2 border-red-500/30"
                     />
-                    <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 bg-red-500 rounded-full flex items-center justify-center">
+                      <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
                         <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
                       </svg>
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-1">{member.name}</h3>
-                  <p className="text-base text-red-400 font-medium mb-1">{member.role}</p>
-                  <p className="text-base text-gray-400 text-center">{member.university}</p>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1 text-center">{member.name}</h3>
+                  <p className="text-sm sm:text-base text-red-400 font-medium mb-1 text-center">{member.role}</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-gray-400 text-center">{member.university}</p>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   )
 } 

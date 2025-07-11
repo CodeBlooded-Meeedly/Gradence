@@ -22,6 +22,7 @@
     "react-select": "^5.10.1",
     "recharts": "^2.15.4",
     "sass": "^1.89.2",
+    "swiper": "^11.2.10",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
