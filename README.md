@@ -27,7 +27,6 @@ A modern, real-time anonymous subject voting and leaderboard web application for
 - **Package Manager**: npm
 
 
-
 ## 🛠️ Getting Started
 
 ### Prerequisites
