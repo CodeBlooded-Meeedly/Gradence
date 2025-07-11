@@ -26,10 +26,6 @@ A modern, real-time anonymous subject voting and leaderboard web application for
 - **Deployment**: Vercel
 - **Package Manager**: npm
 
-## 📸 Screenshots
-
-> _Add screenshots here to showcase the UI_
-
 ## 🛠️ Getting Started
 
 ### Prerequisites
